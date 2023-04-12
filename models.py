@@ -20,24 +20,28 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 class Flashcard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(200), nullable=False)
     answer = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    flashcard_set_id = db.Column(db.Integer, db.ForeignKey('flashcard_set.id', name='fk_flashcard_set_id'), nullable=True)  # Added ForeignKey with name
 
     def __repr__(self):
-        return f"Flashcard('{self.question}', '{self.answer}')" 
+        return f"Flashcard('{self.question}', '{self.answer}')"
+
+
 class FlashcardSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)
+    flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)  # Added relationship
 
     def __repr__(self):
         return f"FlashcardSet('{self.title}', '{self.description}')"
-  
+
 class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
