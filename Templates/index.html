@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Create a new flashcard</h1>
+    {% if current_user.is_authenticated %}
+    <form id="question-form">
+        <div class="form-group">
+            <label for="question">Question:</label>
+            <input type="text" class="form-control" id="question" name="question" required>
+        </div>
+        <div class="form-group">
+            <label for="article-text">Paste an article (optional):</label>
+            <textarea class="form-control" id="article-text" name="article_text" rows="10" cols="50"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="url">Article or Video URL (optional):</label>
+            <input type="text" class="form-control" id="url" name="url">
+        </div>
+        <button type="submit" class="btn btn-primary">Ask Question</button>
+    </form>
+    <br>
+    <h2>Answer</h2>
+    <div id="answer"></div>
+    <br>
+    <button id="save-flashcard" class="btn btn-primary">Create Flashcard</button>
+    <br><br>
+    <h2>Your Flashcards</h2>
+    <div id="flashcard-container"></div>
+    </form>
+{% else %}
+    <p>Please <a href="{{ url_for('login') }}">log in</a> to create a flashcard.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+const form = document.querySelector('#question-form');
+const saveFlashcardBtn = document.querySelector('#save-flashcard');
+let currentAnswer = '';
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const question = document.querySelector('#question').value;
+    let articleText = document.querySelector('#article-text').value;
+    const url = document.querySelector('#url').value;
+    let captionsText = '';
+
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        const response = await fetch('/captions', {
+            method: 'POST',
+            body: JSON.stringify({
+                video_url: url
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            console.error(data.error);
+        } else {
+            captionsText = data.join('\n');
+        }
+    }
+
+    const response = await fetch('/ask', {
+        method: 'POST',
+        body: JSON.stringify({
+            question: question,
+            article_text: (url.includes("youtube.com") || url.includes("youtu.be")) ? captionsText : articleText,
+            url: url
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    const data = await response.json();
+    currentAnswer = data.answer;
+    document.getElementById("answer").innerHTML = currentAnswer;
+});
+       saveFlashcardBtn.addEventListener('click', () => {
+            const question = document.querySelector('#question').value;
+            const flashcardContainer = document.querySelector('#flashcard-container');
+
+            const card = document.createElement('div');
+            card.classList.add('card');
+
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body');
+
+            const cardTitle = document.createElement('h5');
+            cardTitle.classList.add('card-title');
+            cardTitle.textContent = question;
+
+            const cardText = document.createElement('p');
+            cardText.classList.add('card-text');
+            cardText.textContent = currentAnswer;
+
+            cardBody.appendChild(cardTitle);
+            cardBody.appendChild(cardText);
+
+            card.appendChild(cardBody);
+
+            flashcardContainer.appendChild(card);
+        });
+    </script>
+{% endblock %}

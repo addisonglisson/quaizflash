@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <p>Your Flashcards:</p>
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+      <th>Actions</th>
+    </tr>
+    {% for flashcard in flashcards %}
+      <tr>
+        <td>{{ flashcard.question }}</td>
+        <td>{{ flashcard.answer }}</td>
+        <td>
+          <a href="{{ url_for('edit_flashcard', flashcard_id=flashcard.id) }}">Edit</a>
+          <a href="{{ url_for('delete_flashcard', flashcard_id=flashcard.id) }}">Delete</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <a href="{{ url_for('my_flashcards') }}">Add a new flashcard</a>
+{% endblock %}

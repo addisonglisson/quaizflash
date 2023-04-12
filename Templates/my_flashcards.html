@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>My Flashcards</h1>
+    {% if flashcards %}
+        <div class="row">
+            {% for flashcard in flashcards %}
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ flashcard.question }}</h5>
+                            <p class="card-text">{{ flashcard.answer }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No flashcards found.</p>
+    {% endif %}
+{% endblock %}
