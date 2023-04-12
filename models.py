@@ -28,7 +28,16 @@ class Flashcard(db.Model):
 
     def __repr__(self):
         return f"Flashcard('{self.question}', '{self.answer}')" 
-    
+class FlashcardSet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)
+
+    def __repr__(self):
+        return f"FlashcardSet('{self.title}', '{self.description}')"
+  
 class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

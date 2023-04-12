@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard
+from forms import FlashcardSet
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -252,6 +253,17 @@ def delete_flashcard(flashcard_id):
     flash('Flashcard deleted!', 'success')
     return redirect(url_for('profile'))
 
+@app.route("/create_flashcard_set/new", methods=["GET", "POST"])
+@login_required
+def create_flashcard_set():
+    form = FlashcardSet()
+    if form.validate_on_submit():
+        flashcard_set = FlashcardSet(title=form.title.data, description=form.description.data, user_id=current_user.id)
+        db.session.add(flashcard_set)
+        db.session.commit()
+        flash("Your flashcard set has been created!", "success")
+        return redirect(url_for("index"))
+    return render_template("create_flashcard_set.html", title="New Flashcard Set", form=form, legend="New Flashcard Set")
 
 @app.route("/my_flashcards", methods=["GET"])
 @login_required

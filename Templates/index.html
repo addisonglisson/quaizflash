@@ -2,6 +2,8 @@
 
 {% block content %}
     <h1>Create a new flashcard</h1>
+    <a class="btn btn-primary" href="{{ url_for('create_flashcard_set') }}">Create Flashcard Set</a>
+    <br><br>
     {% if current_user.is_authenticated %}
     <form id="question-form">
         <div class="form-group">
