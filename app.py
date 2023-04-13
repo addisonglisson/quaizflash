@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
-from models import User, Flashcard
+from models import User, Flashcard, FlashcardSet
 from forms import FlashcardSetForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -132,7 +132,8 @@ def logout():
 @login_required
 def profile():
     flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
-    return render_template('profile.html', title='Profile', flashcards=flashcards)
+    flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
+    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets)
 
 @app.route("/ask", methods=["POST"])
 @login_required
@@ -258,7 +259,7 @@ def delete_flashcard(flashcard_id):
 def create_flashcard_set():
     form = FlashcardSetForm()
     if form.validate_on_submit():
-        flashcard_set = FlashcardSetForm(title=form.title.data, description=form.description.data, user_id=current_user.id)
+        flashcard_set = FlashcardSet(title=form.title.data, description=form.description.data, user_id=current_user.id)
         db.session.add(flashcard_set)
         db.session.commit()
         flash("Your flashcard set has been created!", "success")

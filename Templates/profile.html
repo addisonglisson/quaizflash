@@ -21,4 +21,17 @@
     {% endfor %}
   </table>
   <a href="{{ url_for('my_flashcards') }}">Add a new flashcard</a>
+
+  {% if flashcard_sets %}
+    <h3>My Flashcard Sets:</h3>
+    <ul>
+        {% for flashcard_set in flashcard_sets %}
+            <li>
+                <strong>{{ flashcard_set.title }}</strong> - {{ flashcard_set.description }}
+            </li>
+        {% endfor %}
+    </ul>
+  {% else %}
+    <p>No flashcard sets found.</p>
+  {% endif %}
 {% endblock %}
