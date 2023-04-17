@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block content %}
+  <h1>Select Set for "{{ flashcard.question }}"</h1>
+  <form method="post">
+    <div class="form-group">
+      <label for="set_id">Set:</label>
+      <select name="set_id" id="set_id" class="form-control">
+        {% for set in sets %}
+          <option value="{{ set.id }}">{{ set.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add to Set</button>
+  </form>
+{% endblock %}

@@ -1,30 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Create a new flashcard</h1>
-    <a class="btn btn-primary" href="{{ url_for('create_flashcard_set') }}">Create Flashcard Set</a>
-    <br><br>
+  <div class="container">
+    <h1>Start Building Your AI Flashcards</h1>
     {% if current_user.is_authenticated %}
-    <form id="question-form">
+    <form id="question-form" class="form">
         <div class="form-group">
             <label for="question">Question:</label>
             <input type="text" class="form-control" id="question" name="question" required>
         </div>
         <div class="form-group">
-            <label for="article-text">Paste an article (optional):</label>
+            <label for="article-text">Text (optional):</label><br>
             <textarea class="form-control" id="article-text" name="article_text" rows="10" cols="50"></textarea>
         </div>
         <div class="form-group">
             <label for="url">Article or Video URL (optional):</label>
             <input type="text" class="form-control" id="url" name="url">
         </div>
-        <button type="submit" class="btn btn-primary">Ask Question</button>
+        <button type="submit" class="btn btn-custom">Ask Question</button>
     </form>
     <br>
+    <a class="btn btn-custom" href="{{ url_for('create_flashcard_set') }}">Create Flashcard Set</a>
+    <br><br>
     <h2>Answer</h2>
     <div id="answer"></div>
     <br>
-    <button id="save-flashcard" class="btn btn-primary">Create Flashcard</button>
+    <button id="save-flashcard" class="btn btn-custom">Create Flashcard</button>
     <br><br>
     <h2>Your Flashcards</h2>
     <div id="flashcard-container"></div>

@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard, FlashcardSet
-from forms import FlashcardSetForm
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -265,14 +265,82 @@ def create_flashcard_set():
         flash("Your flashcard set has been created!", "success")
         return redirect(url_for("index"))
     return render_template("create_flashcard_set.html", title="New Flashcard Set", form=form, legend="New Flashcard Set")
+@app.route("/flashcard_set/<int:set_id>")
+@login_required
+def flashcard_set(set_id):
+    flashcard_set = FlashcardSet.query.get_or_404(set_id)
+    if flashcard_set.user_id != current_user.id:
+        abort(403)
+
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+    return render_template("flashcard_set.html", title=flashcard_set.title, flashcards=flashcards, flashcard_set=flashcard_set)
+
+@app.route("/flashcard_set/<int:set_id>/add_to_set", methods=["GET", "POST"])
+@login_required
+def add_to_set(set_id):
+    flashcard_set = FlashcardSet.query.get_or_404(set_id)
+    if flashcard_set.user_id != current_user.id:
+        abort(403)
+
+    form = AddToSetForm()
+    
+    form.flashcard.choices = [(flashcard.id, flashcard.question) for flashcard in Flashcard.query.filter(
+        (Flashcard.flashcard_set_id == None) | (Flashcard.flashcard_set_id == set_id),
+        Flashcard.user_id == current_user.id
+    ).all()]
+
+
+    if form.validate_on_submit():
+        flashcard = Flashcard.query.get(form.flashcard_id.data)
+        print(set_id)
+        flashcard.flashcard_set_id = set_id
+        db.session.commit()
+
+        flash("Flashcard added to set!", "success")
+        return redirect(url_for("flashcard_set", set_id=set_id))
+
+    return render_template("add_to_set.html", title="Add Flashcard to Set", form=form, flashcard_set=flashcard_set)
+@app.route('/flashcard/<int:flashcard_id>/select_set', methods=['GET', 'POST'])
+@login_required
+def select_set(flashcard_id):
+    flashcard = Flashcard.query.get_or_404(flashcard_id)
+    sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
+
+    if request.method == 'POST':
+        set_id = request.form['set_id']
+        flashcard.flashcard_set_id = set_id
+        db.session.commit()
+        return redirect(url_for('profile'))
+
+    return render_template('select_set.html', title='Select Set', flashcard=flashcard, sets=sets)
+
+
+@app.route("/flashcard_set/<int:set_id>/new_flashcard", methods=["GET", "POST"])
+@login_required
+def new_flashcard(set_id):
+    flashcard_set = FlashcardSet.query.get_or_404(set_id)
+    if flashcard_set.user_id != current_user.id:
+        abort(403)
+    form = FlashcardForm()
+    if form.validate_on_submit():
+        if request.referrer and 'my_flashcards' in request.referrer:
+            flashcard = Flashcard(question=form.question.data, answer=form.answer.data, user_id=current_user.id)
+        else:
+            flashcard = Flashcard(question=form.question.data, answer=form.answer.data, user_id=current_user.id, flashcard_set_id=set_id)
+        db.session.add(flashcard)
+        db.session.commit()
+        flash("Your flashcard has been added!", "success")
+        return redirect(url_for("profile"))
+    return render_template("new_flashcard.html", title="New Flashcard", form=form, legend="New Flashcard")
 
 @app.route("/my_flashcards", methods=["GET"])
 @login_required
 def my_flashcards():
     user_id = session["user_id"]
     flashcards = Flashcard.query.filter_by(user_id=user_id).all()
+    sets = FlashcardSet.query.filter_by(user_id=user_id).all()
 
-    return render_template("my_flashcards.html", flashcards=flashcards)
+    return render_template("my_flashcards.html", flashcards=flashcards,sets=sets)
 
 if __name__ == "__main__":
     app.run(debug=True)

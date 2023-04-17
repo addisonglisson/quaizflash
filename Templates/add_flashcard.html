@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Add Flashcard to Set</h1>
+    <form action="{{ url_for('add_flashcard', set_id=set_id) }}" method="post">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.flashcard_id.label(for='flashcard_id') }}
+            {{ form.flashcard_id(class='form-control', id='flashcard_id') }}
+        </div>
+        <input type="submit" value="Add Flashcard" class="btn btn-primary">
+    </form>
+{% endblock %}

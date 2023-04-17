@@ -2,8 +2,8 @@
 
 {% block content %}
   <h1>{{ title }}</h1>
-  <p>Your Flashcards:</p>
-  <table>
+  <h2 class="section-title">Your Flashcards</h2>
+  <table class="flashcards-table">
     <tr>
       <th>Question</th>
       <th>Answer</th>
@@ -13,22 +13,35 @@
       <tr>
         <td>{{ flashcard.question }}</td>
         <td>{{ flashcard.answer }}</td>
-        <td>
-          <a href="{{ url_for('edit_flashcard', flashcard_id=flashcard.id) }}">Edit</a>
-          <a href="{{ url_for('delete_flashcard', flashcard_id=flashcard.id) }}">Delete</a>
+        <td class="actions">
+          <form method="GET" action="{{ url_for('edit_flashcard', flashcard_id=flashcard.id) }}" style="display: inline;">
+            <input type="submit" value="Edit" class="btn btn-sm btn-outline-info">
+          </form>
+          <form method="POST" action="{{ url_for('delete_flashcard', flashcard_id=flashcard.id) }}" style="display: inline;">
+            <input type="submit" value="Delete" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this flashcard?');">
+          </form>
+          <form method="GET" action="{{ url_for('select_set', flashcard_id=flashcard.id) }}" style="display: inline;">
+            <input type="submit" value="Add to Set" class="btn btn-sm btn-outline-primary">
+          </form>
         </td>
       </tr>
     {% endfor %}
   </table>
-  <a href="{{ url_for('my_flashcards') }}">Add a new flashcard</a>
 
   {% if flashcard_sets %}
-    <h3>My Flashcard Sets:</h3>
+    <h3 class="section-title">My Flashcard Sets</h3>
     <ul>
         {% for flashcard_set in flashcard_sets %}
-            <li>
-                <strong>{{ flashcard_set.title }}</strong> - {{ flashcard_set.description }}
-            </li>
+        <div class="flashcard-set">
+          <p class="set-title"><strong>{{ flashcard_set.title }}</strong></p>
+          <p class="set-description">{{ flashcard_set.description }}</p>
+                <form method="GET" action="{{ url_for('new_flashcard', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
+                  <input type="submit" value="Add Flashcard" class="btn btn-sm btn-outline-info">
+                </form>
+                <form method="GET" action="{{ url_for('flashcard_set', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
+                  <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
+                </form>
+              </div>
         {% endfor %}
     </ul>
   {% else %}

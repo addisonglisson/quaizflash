@@ -17,24 +17,27 @@
 </head>
 
 <body>
-    <nav>
-        <ul>
-            {% if 'user_id' in session %}
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
-            </li>
-            {% else %}
-            <li><a href="{{ url_for('register') }}">Register</a></li>
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            {% endif %}
-        </ul>
-    </nav>
     <header class="main-header">
         <div class="container">
-            <a href="{{ url_for('index') }}">Video Q&A</a>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="brand">Video Q&A</a>
+                <ul class="nav-list">
+                    {% if 'user_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link profile-link" href="{{ url_for('profile') }}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+                    </li>
+                    {% else %}
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </header>
+
 
     <section class="content">
         <div class="container">

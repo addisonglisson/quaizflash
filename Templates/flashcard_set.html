@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{{ flashcard_set.title }}</h1>
+  <hr>
+
+  {% for flashcard in flashcard_set.flashcards %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ flashcard.question }}</h5>
+        <p class="card-text">{{ flashcard.answer }}</p>
+      </div>
+    </div>
+  {% endfor %}
+
+  <a href="{{ url_for('new_flashcard', set_id=flashcard_set.id) }}" class="btn btn-primary">Add Flashcard</a>
+{% endblock %}
