@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>Quiz</h1>
+    <div id="flashcard-container" class="text-center">
+        {% for flashcard in flashcards %}
+          <div class="flashcard" id="flashcard-{{ flashcard.id }}" style="display: none;">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title question">{{ flashcard.question }}</h5>
+                <p class="card-text answer" style="display: none;">{{ flashcard.answer }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="d-flex justify-content-center my-3">
+        <button id="prev-btn" class="btn btn-secondary mx-1" disabled>Previous</button>
+        <button id="flip-btn" class="btn btn-primary mx-1">Flip</button>
+        <button id="next-btn" class="btn btn-secondary mx-1" {% if flashcards|length == 1 %}disabled{% endif %}>Next</button>
+        <button id="submit-btn" class="btn btn-info mx-1" style="display: none;">Submit</button>
+      </div>
+      <div class="d-flex justify-content-center my-3">
+        <button id="correct-btn" class="btn btn-success mx-1">Correct</button>
+        <button id="incorrect-btn" class="btn btn-danger mx-1">Incorrect</button>
+      </div>
+      
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script>
+    const quizMode = "{{ quiz_mode }}";
+    const flashcards = document.querySelectorAll('.flashcard');
+    const prevBtn = document.querySelector('#prev-btn');
+    const nextBtn = document.querySelector('#next-btn');
+    const flipBtn = document.querySelector('#flip-btn');
+    const correctBtn = document.querySelector('#correct-btn');
+    const incorrectBtn = document.querySelector('#incorrect-btn');
+    const submitBtn = document.querySelector('#submit-btn');
+    let currentFlashcardIndex = 0;
+
+    function showFlashcard(index) {
+      flashcards.forEach((flashcard, i) => {
+        flashcard.style.display = (i === index) ? 'block' : 'none';
+        const question = flashcard.querySelector('.question');
+        const answer = flashcard.querySelector('.answer');
+        
+        if (quizMode === "question") {
+          question.style.display = 'block';
+          answer.style.display = 'none';
+        } else if (quizMode === "answer") {
+          question.style.display = 'none';
+          answer.style.display = 'block';
+        } else {
+          question.style.display = 'block';
+          answer.style.display = 'block';
+        }
+      });
+    }
+
+    prevBtn.addEventListener('click', () => {
+      currentFlashcardIndex--;
+      showFlashcard(currentFlashcardIndex);
+      nextBtn.disabled = false;
+      if (currentFlashcardIndex === 0) {
+        prevBtn.disabled = true;
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentFlashcardIndex++;
+      showFlashcard(currentFlashcardIndex);
+      prevBtn.disabled = false;
+      if (currentFlashcardIndex === flashcards.length - 1) {
+        nextBtn.disabled = true;
+        submitBtn.style.display = 'block';
+      }
+    });
+
+    flipBtn.addEventListener('click', () => {
+      const currentFlashcard = flashcards[currentFlashcardIndex];
+      const question = currentFlashcard.querySelector('.question');
+      const answer = currentFlashcard.querySelector('.answer');
+      const isQuestionVisible = question.style.display !== 'none';
+
+      question.style.display = isQuestionVisible ? 'none' : 'block';
+      answer.style.display = isQuestionVisible ? 'block' : 'none';
+    });
+    async function submitAnswer(correct, timeSpent, quizFinished = false) {
+      const currentFlashcard = flashcards[currentFlashcardIndex];
+      const flashcardId = currentFlashcard.id.split('-')[1];
+      const set_id = "{{ flashcard_set.id }}";
+      const response = await fetch('/submit_interaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          set_id: set_id,
+          flashcard_id: flashcardId,
+          correct: correct,
+          time_spent: 0,
+          quiz_finished: quizFinished
+        })
+      });
+
+      if (response.ok) {
+        console.log('Answer submitted successfully');
+      } else {
+        console.error('Failed to submit answer');
+      }
+    }
+
+    correctBtn.addEventListener('click', () => {
+      submitAnswer(true);
+    });
+
+    incorrectBtn.addEventListener('click', () => {
+      submitAnswer(false);
+    });
+
+    submitBtn.addEventListener('click', () => {
+      submitAnswer(null, null, true);
+      window.location.href = '/progress'; // Redirect to the progress page
+    });
+
+    showFlashcard(currentFlashcardIndex);
+
+  </script>
+{% endblock %}

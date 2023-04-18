@@ -8,19 +8,33 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
-from models import User, Flashcard, FlashcardSet
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm
+from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask import abort
+from datetime import datetime
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "5a4379b0d0a662d6d1f14b3f6b1e6d92"
 openai.api_key = os.environ.get('OPENAI_API_KEY')  # Replace 'OPENAI_API_KEY' with your actual API key variable name
+def get_chatgpt_response(user_message, context=None):
+    prompt = f"{context}\nUser: {user_message}\nChatGPT:"
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=100,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+    message = response.choices[0].text.strip()
+    return message
+
 # Initialize the LoginManager
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -332,6 +346,126 @@ def new_flashcard(set_id):
         flash("Your flashcard has been added!", "success")
         return redirect(url_for("profile"))
     return render_template("new_flashcard.html", title="New Flashcard", form=form, legend="New Flashcard")
+
+@app.route('/quiz/<int:set_id>/<quiz_mode>')
+def quiz(set_id, quiz_mode):
+    # You'll need to fetch the flashcard set and its cards from the database here
+    flashcard_set = FlashcardSet.query.get(set_id)
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+
+    return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode)
+
+@app.route('/quiz-settings/<int:set_id>', methods=['GET', 'POST'])
+def quiz_settings(set_id):
+    if request.method == 'POST':
+        quiz_mode = request.form.get('quiz_mode')
+        return redirect(url_for('quiz', set_id=set_id, quiz_mode=quiz_mode))
+
+    flashcard_set = FlashcardSet.query.get(set_id)
+    return render_template('quiz_settings.html', title='Quiz Settings', flashcard_set=flashcard_set)
+@app.route('/submit_interaction', methods=['POST'])
+def submit_interaction():
+    data = request.get_json()  # Add this line to get JSON data from the request
+    user_id = current_user.id
+    set_id = data.get('set_id')
+    flashcard_id = data.get('flashcard_id')
+    correct = data.get('correct')
+    time_spent = int(data.get('time_spent'))
+    quiz_finished = data.get('quiz_finished', False)
+
+    study_session = StudySession.query.filter_by(user_id=user_id, flashcard_set_id=set_id, end_time=None).first()
+
+    if not study_session:
+        study_session = StudySession(user_id=user_id, start_time=datetime.utcnow(), flashcard_set_id=set_id)
+        db.session.add(study_session)
+        db.session.commit()
+
+
+    # Create a new FlashcardInteraction instance and save it to the database
+    interaction = FlashcardInteraction(study_session_id=study_session.id, flashcard_id=flashcard_id, correct=correct, time_spent=time_spent)
+    db.session.add(interaction)
+
+    if quiz_finished:
+        study_session.end_time = datetime.utcnow()
+
+    db.session.commit()
+
+    return {'status': 'success'}
+
+@app.route('/api/update-flashcard', methods=['POST'])
+def update_flashcard():
+    data = request.json
+    flashcard_id = data['flashcard_id']
+    correct = data['correct']
+
+    flashcard = Flashcard.query.get(flashcard_id)
+
+    if correct:
+        flashcard.correct_count += 1
+    else:
+        flashcard.incorrect_count += 1
+
+    db.session.commit()
+
+    return jsonify({'message': 'Flashcard updated successfully'})
+
+@app.route('/progress')
+@login_required
+def progress():
+    user_id = current_user.id
+    study_sessions = StudySession.query.filter_by(user_id=user_id).all()
+    
+    # Create a dictionary to store insights for each flashcard set
+    progress_data = {}
+    for session in study_sessions:
+        if session.flashcard_set_id not in progress_data:
+            progress_data[session.flashcard_set_id] = {
+                'set_title': session.flashcard_set.title,
+                'total_sessions': 0,
+                'total_time_spent': 0,
+                'total_correct': 0,
+                'total_incorrect': 0
+            }
+        progress_data[session.flashcard_set_id]['total_sessions'] += 1
+
+        interactions = FlashcardInteraction.query.filter_by(study_session_id=session.id).all()
+        for interaction in interactions:
+            progress_data[session.flashcard_set_id]['total_time_spent'] += interaction.time_spent
+            if interaction.correct:
+                progress_data[session.flashcard_set_id]['total_correct'] += 1
+            else:
+                progress_data[session.flashcard_set_id]['total_incorrect'] += 1
+
+    return render_template('progress.html', title='Progress', progress_data=progress_data)
+
+@app.route('/virtual_tutor', methods=['GET', 'POST'])
+@login_required
+def virtual_tutor():
+    form = VirtualTutorForm()
+    conversation_history = session.get('conversation_history', [])
+
+    if form.validate_on_submit():
+        subject = form.subject.data
+        user_input = form.user_input.data
+        conversation_history.append({'role': 'user', 'content': user_input})
+
+        history_text = "\n".join([entry['content'] for entry in conversation_history[-10:]])
+        prompt = f"I am a {subject} tutor.\n{history_text}\n{user_input}"
+        response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=prompt,
+            max_tokens=100,
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+
+        gpt_response = response.choices[0].text.strip()
+        conversation_history.append({'role': 'tutor', 'content': gpt_response})
+        session['conversation_history'] = conversation_history
+
+    conversation_history = conversation_history[::-1]
+    return render_template('virtual_tutor.html', title='Virtual Tutor', form=form, conversation_history=conversation_history)
 
 @app.route("/my_flashcards", methods=["GET"])
 @login_required

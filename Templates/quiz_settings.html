@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <p>Select quiz mode for "{{ flashcard_set.title }}"</p>
+  <form method="POST">
+    <div class="form-group">
+      <label for="quiz_mode">Quiz Mode:</label>
+      <select class="form-control" id="quiz_mode" name="quiz_mode">
+        <option value="question">Start with Questions</option>
+        <option value="answer">Start with Answers</option>
+        <option value="both">Show Both Questions and Answers</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Start Quiz</button>
+  </form>
+{% endblock %}

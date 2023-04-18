@@ -41,6 +41,9 @@
                 <form method="GET" action="{{ url_for('flashcard_set', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
                   <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
                 </form>
+                <form method="GET" action="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
+                  <input type="submit" value="Quiz Me" class="btn btn-sm btn-outline-success">
+                </form>                              
               </div>
         {% endfor %}
     </ul>

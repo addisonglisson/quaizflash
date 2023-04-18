@@ -11,6 +11,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(100), nullable=False)
     flashcards = db.relationship('Flashcard', backref='user', lazy=True)
     flashcard_sets = db.relationship('FlashcardSet', backref='author', lazy=True)
+    
 
 
 
@@ -40,6 +41,8 @@ class FlashcardSet(db.Model):
     description = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)  # Added relationship
+    correct_count = db.Column(db.Integer, default=0)  # Add this line
+    incorrect_count = db.Column(db.Integer, default=0)  # Add this line
 
     def __repr__(self):
         return f"FlashcardSet('{self.title}', '{self.description}')"
@@ -63,3 +66,22 @@ class Card(db.Model):
 
     def __repr__(self):
         return f"<Card {self.front}>"
+    
+class StudySession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=True)  # Nullable since a session can be ongoing
+    flashcard_set_id = db.Column(db.Integer, db.ForeignKey('flashcard_set.id'), nullable=False)
+    flashcard_set = db.relationship('FlashcardSet', backref='study_sessions', lazy=True)
+    def __repr__(self):
+        return f"<StudySession {self.id}>"
+class FlashcardInteraction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    study_session_id = db.Column(db.Integer, db.ForeignKey('study_session.id'), nullable=False)
+    flashcard_id = db.Column(db.Integer, db.ForeignKey('flashcard.id'), nullable=False)
+    correct = db.Column(db.Boolean, nullable=False)
+    time_spent = db.Column(db.Integer, nullable=False)  # Time spent on the flashcard in seconds
+    
+    def __repr__(self):
+        return f"<FlashcardInteraction {self.id}>"

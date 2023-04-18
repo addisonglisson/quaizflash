@@ -15,3 +15,7 @@ class FlashcardForm(FlaskForm):
 class AddToSetForm(FlaskForm):
     flashcard_id = SelectField('Flashcard', coerce=int)
     submit = SubmitField('Add Flashcard')
+class VirtualTutorForm(FlaskForm):
+    subject = StringField('Subject', validators=[DataRequired()])
+    user_input = StringField('User Input', validators=[DataRequired()])
+    submit = SubmitField('Submit')

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>Progress</h1>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Flashcard Set</th>
+          <th scope="col">Study Sessions</th>
+          <th scope="col">Total Time Spent</th>
+          <th scope="col">Correct Answers</th>
+          <th scope="col">Incorrect Answers</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for set_id, data in progress_data.items() %}
+          <tr>
+            <td>{{ data.set_title }}</td>
+            <td>{{ data.total_sessions }}</td>
+            <td>{{ data.total_time_spent }} seconds</td>
+            <td>{{ data.total_correct }}</td>
+            <td>{{ data.total_incorrect }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+{% endblock %}
