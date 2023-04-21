@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>Search Public Flashcard Sets</h1>
+
+    <form method="POST" action="{{ url_for('search_sets') }}" class="search-form">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label for="search_query" class="search-label">Search:</label>
+        <input type="text" name="search_query" id="search_query" class="form-control search-input" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if search_results %}
+      <div class="search-results">
+        <h2><span class="search-results-title">Search Results</span></h2>
+        <ul>
+        {% for result in search_results %}
+          <li>{{ result.title }}</li>
+          <form method="GET" action="{{ url_for('view_searched_set',set_id=result.id ) }}" class="inline-form">
+            <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
+          </form>
+          <form method="GET" action="{{ url_for('quiz_searched_set',set_id=result.id, quiz_mode='question' ) }}" class="inline-form">
+            <input type="submit" value="Quiz Set" class="btn btn-sm btn-outline-primary">
+          </form>
+        {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

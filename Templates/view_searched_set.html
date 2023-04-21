@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>View Searched Set: "{{ flashcard_set.title }}"</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Question</th>
+                    <th scope="col">Answer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flashcard in flashcards %}
+                <tr>
+                    <td>{{ flashcard.question }}</td>
+                    <td>{{ flashcard.answer }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

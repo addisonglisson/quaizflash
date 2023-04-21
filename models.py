@@ -43,6 +43,8 @@ class FlashcardSet(db.Model):
     flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)  # Added relationship
     correct_count = db.Column(db.Integer, default=0)  # Add this line
     incorrect_count = db.Column(db.Integer, default=0)  # Add this line
+    flashcards = db.relationship('Flashcard', backref='flashcard_set', lazy=True)
+    public = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f"FlashcardSet('{self.title}', '{self.description}')"

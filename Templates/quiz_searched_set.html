@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Quiz Searched Set: "{{ flashcard_set.title }}"</h1>
+
+        <form method="post">
+            {% for flashcard in flashcards %}
+                <div class="form-group">
+                    <label for="flashcard_{{ flashcard.id }}">{{ flashcard.question }}</label>
+                    <input type="text" name="answer_{{ flashcard.id }}" id="flashcard_{{ flashcard.id }}" class="form-control">
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit Quiz</button>
+        </form>
+    </div>
+{% endblock %}

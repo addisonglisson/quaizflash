@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -84,7 +84,7 @@ def fetch_youtube_captions(video_url):
 @app.route("/", methods=["GET"])
 @login_required
 def index():
-    return render_template("index.html")
+    return render_template("index.html", search_form=SearchSetsForm())
 
 
 
@@ -115,7 +115,7 @@ def register():
         flash("Registration successful! Please log in.")
         return redirect(url_for("login"))
 
-    return render_template("register.html")
+    return render_template("register.html", search_form=SearchSetsForm())
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -131,7 +131,7 @@ def login():
        else:
            flash("Invalid email or password. Please try again")
 
-   return render_template("login.html")
+   return render_template("login.html", search_form=SearchSetsForm())
 
 
 
@@ -147,7 +147,7 @@ def logout():
 def profile():
     flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
     flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
-    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets)
+    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets, search_form=SearchSetsForm())
 
 @app.route("/ask", methods=["POST"])
 @login_required
@@ -254,7 +254,7 @@ def edit_flashcard(flashcard_id):
         flash('Flashcard updated!', 'success')
         return redirect(url_for('profile'))
 
-    return render_template('edit_flashcard.html', title='Edit Flashcard', flashcard=flashcard)
+    return render_template('edit_flashcard.html', title='Edit Flashcard', flashcard=flashcard, search_form=SearchSetsForm())
 
 @app.route('/delete_flashcard/<int:flashcard_id>', methods=['POST'])
 @login_required
@@ -278,7 +278,7 @@ def create_flashcard_set():
         db.session.commit()
         flash("Your flashcard set has been created!", "success")
         return redirect(url_for("index"))
-    return render_template("create_flashcard_set.html", title="New Flashcard Set", form=form, legend="New Flashcard Set")
+    return render_template("create_flashcard_set.html", title="New Flashcard Set", form=form, legend="New Flashcard Set", search_form=SearchSetsForm())
 @app.route("/flashcard_set/<int:set_id>")
 @login_required
 def flashcard_set(set_id):
@@ -287,7 +287,7 @@ def flashcard_set(set_id):
         abort(403)
 
     flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
-    return render_template("flashcard_set.html", title=flashcard_set.title, flashcards=flashcards, flashcard_set=flashcard_set)
+    return render_template("flashcard_set.html", title=flashcard_set.title, flashcards=flashcards, flashcard_set=flashcard_set, search_form=SearchSetsForm())
 
 @app.route("/flashcard_set/<int:set_id>/add_to_set", methods=["GET", "POST"])
 @login_required
@@ -313,7 +313,7 @@ def add_to_set(set_id):
         flash("Flashcard added to set!", "success")
         return redirect(url_for("flashcard_set", set_id=set_id))
 
-    return render_template("add_to_set.html", title="Add Flashcard to Set", form=form, flashcard_set=flashcard_set)
+    return render_template("add_to_set.html", title="Add Flashcard to Set", form=form, flashcard_set=flashcard_set, search_form=SearchSetsForm())
 @app.route('/flashcard/<int:flashcard_id>/select_set', methods=['GET', 'POST'])
 @login_required
 def select_set(flashcard_id):
@@ -326,7 +326,7 @@ def select_set(flashcard_id):
         db.session.commit()
         return redirect(url_for('profile'))
 
-    return render_template('select_set.html', title='Select Set', flashcard=flashcard, sets=sets)
+    return render_template('select_set.html', title='Select Set', flashcard=flashcard, sets=sets, search_form=SearchSetsForm())
 
 
 @app.route("/flashcard_set/<int:set_id>/new_flashcard", methods=["GET", "POST"])
@@ -345,7 +345,7 @@ def new_flashcard(set_id):
         db.session.commit()
         flash("Your flashcard has been added!", "success")
         return redirect(url_for("profile"))
-    return render_template("new_flashcard.html", title="New Flashcard", form=form, legend="New Flashcard")
+    return render_template("new_flashcard.html", title="New Flashcard", form=form, legend="New Flashcard", search_form=SearchSetsForm())
 
 @app.route('/quiz/<int:set_id>/<quiz_mode>')
 def quiz(set_id, quiz_mode):
@@ -353,7 +353,7 @@ def quiz(set_id, quiz_mode):
     flashcard_set = FlashcardSet.query.get(set_id)
     flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
 
-    return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode)
+    return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode, search_form=SearchSetsForm())
 
 @app.route('/quiz-settings/<int:set_id>', methods=['GET', 'POST'])
 def quiz_settings(set_id):
@@ -362,7 +362,7 @@ def quiz_settings(set_id):
         return redirect(url_for('quiz', set_id=set_id, quiz_mode=quiz_mode))
 
     flashcard_set = FlashcardSet.query.get(set_id)
-    return render_template('quiz_settings.html', title='Quiz Settings', flashcard_set=flashcard_set)
+    return render_template('quiz_settings.html', title='Quiz Settings', flashcard_set=flashcard_set, search_form=SearchSetsForm())
 @app.route('/submit_interaction', methods=['POST'])
 def submit_interaction():
     data = request.get_json()  # Add this line to get JSON data from the request
@@ -436,7 +436,7 @@ def progress():
             else:
                 progress_data[session.flashcard_set_id]['total_incorrect'] += 1
 
-    return render_template('progress.html', title='Progress', progress_data=progress_data)
+    return render_template('progress.html', title='Progress', progress_data=progress_data, search_form=SearchSetsForm())
 
 @app.route('/virtual_tutor', methods=['GET', 'POST'])
 @login_required
@@ -465,7 +465,37 @@ def virtual_tutor():
         session['conversation_history'] = conversation_history
 
     conversation_history = conversation_history[::-1]
-    return render_template('virtual_tutor.html', title='Virtual Tutor', form=form, conversation_history=conversation_history)
+    return render_template('virtual_tutor.html', title='Virtual Tutor', form=form, conversation_history=conversation_history, search_form=SearchSetsForm())
+@app.route('/search_sets', methods=['GET', 'POST'])
+@login_required
+def search_sets():
+    form = SearchSetsForm()
+    search_results = []
+
+    if form.validate_on_submit():
+        search_query = form.search_query.data
+
+        # Perform a search for public flashcard sets containing the search query
+        search_results = FlashcardSet.query.filter(FlashcardSet.public == True, FlashcardSet.title.contains(search_query)).all()
+
+        for result in search_results:
+            first_flashcard = Flashcard.query.filter_by(flashcard_set_id=result.id).first()
+            result.first_flashcard_id = first_flashcard.id if first_flashcard else None
+
+    return render_template('search_sets.html', title='Search Public Sets', form=form, search_results=search_results, search_form=SearchSetsForm())
+
+@app.route('/quiz_searched_set/<int:set_id>/<quiz_mode>')
+def quiz_searched_set(set_id, quiz_mode):
+    flashcard_set = FlashcardSet.query.get_or_404(set_id)
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+
+    return render_template('quiz.html', title='Quiz Searched Set', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode, search_form=SearchSetsForm())
+
+@app.route('/view_searched_set/<int:set_id>')
+def view_searched_set(set_id):
+    flashcard_set = FlashcardSet.query.get_or_404(set_id)
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+    return render_template('view_searched_set.html', title='View Searched Set', flashcard_set=flashcard_set, flashcards=flashcards, search_form=SearchSetsForm())
 
 @app.route("/my_flashcards", methods=["GET"])
 @login_required

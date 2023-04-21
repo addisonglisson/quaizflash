@@ -19,3 +19,7 @@ class VirtualTutorForm(FlaskForm):
     subject = StringField('Subject', validators=[DataRequired()])
     user_input = StringField('User Input', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class SearchSetsForm(FlaskForm):
+    search_query = StringField('Search Query', validators=[DataRequired()])
+    submit = SubmitField('Search')
