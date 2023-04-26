@@ -17,6 +17,8 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask import abort
 from datetime import datetime
+from random import shuffle
+from sqlalchemy.sql.expression import func
 
 
 app = Flask(__name__)
@@ -84,6 +86,8 @@ def fetch_youtube_captions(video_url):
 @app.route("/", methods=["GET"])
 @login_required
 def index():
+    is_logged_in = 'user_id' in session
+    print("Session data:", session)
     return render_template("index.html", search_form=SearchSetsForm())
 
 
@@ -126,6 +130,7 @@ def login():
        user = User.query.filter_by(email=email).first()
        if user and check_password_hash(user.password_hash, password):
            login_user(user)  # Use Flask-Login's login_user() function
+           session["logged_in"] = True
            flash("Logged in successfully!")
            return redirect(url_for("index"))
        else:
@@ -138,6 +143,7 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()  # Use Flask-Login's logout_user() function
+    session.pop("logged_in", None)
     flash("Logged out successfully!")
     return redirect(url_for("login"))
 
@@ -353,6 +359,10 @@ def quiz(set_id, quiz_mode):
     flashcard_set = FlashcardSet.query.get(set_id)
     flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
 
+    if quiz_mode == "multiple_choice":
+        return redirect(url_for('quiz_set_multiple_choice', set_id=set_id))  # Redirect to the multiple choice quiz route
+
+
     return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode, search_form=SearchSetsForm())
 
 @app.route('/quiz-settings/<int:set_id>', methods=['GET', 'POST'])
@@ -505,6 +515,27 @@ def my_flashcards():
     sets = FlashcardSet.query.filter_by(user_id=user_id).all()
 
     return render_template("my_flashcards.html", flashcards=flashcards,sets=sets)
+
+@app.route('/quiz-set-multiple-choice/<int:set_id>')
+def quiz_set_multiple_choice(set_id):
+    flashcard_set = FlashcardSet.query.get(set_id)
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+
+    mc_flashcards = []
+
+    for flashcard in flashcards:
+        mc_options = [flashcard.answer]
+        wrong_options = Flashcard.query.filter(Flashcard.id != flashcard.id).order_by(func.random()).limit(3).all()
+        mc_options.extend([wrong_option.answer for wrong_option in wrong_options])
+        shuffle(mc_options)
+
+        mc_flashcards.append({
+            'question': flashcard.question,
+            'answer': flashcard.answer,
+            'options': mc_options
+        })
+
+    return render_template('quiz_set_multiple_choice.html', title='Multiple Choice Quiz', flashcard_set=flashcard_set, mc_flashcards=mc_flashcards, search_form=SearchSetsForm())
 
 if __name__ == "__main__":
     app.run(debug=True)
