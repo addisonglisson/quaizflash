@@ -46,7 +46,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database_file.db'  # Replace with your desired database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','sqlite:///your_database_file.db' ) # Replace with your desired database URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 # Initialize Flask-Migrate
