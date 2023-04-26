@@ -541,4 +541,4 @@ def quiz_set_multiple_choice(set_id):
     return render_template('quiz_set_multiple_choice.html', title='Multiple Choice Quiz', flashcard_set=flashcard_set, mc_flashcards=mc_flashcards, search_form=SearchSetsForm())
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=False)
