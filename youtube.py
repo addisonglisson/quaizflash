@@ -3,7 +3,8 @@ import requests
 import xmltodict
 from googleapiclient.discovery import build
 
-YOUTUBE_API_KEY = "AIzaSyBtW0DbuuqFMLz31MJyCy5lwRC8Zm60o8E"
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+
 
 
 youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY, credentials=None)
