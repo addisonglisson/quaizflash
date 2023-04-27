@@ -463,14 +463,14 @@ def virtual_tutor():
         conversation_history.append({'role': 'user', 'content': user_input})
 
         history_text = "\n".join([entry['content'] for entry in conversation_history[-10:]])
-        prompt = f"I am a {subject} tutor.\n{history_text}\n{user_input}"
+        prompt = f"ChatGPT, you are an expert {subject} tutor. Please provide accurate, helpful, and easy-to-understand answers to any questions related to {subject}. When possible, include step-by-step explanations or examples to help the user better understand your answers.\n\n{history_text}\n{user_input}"
         response = openai.Completion.create(
             engine="text-davinci-002",
             prompt=prompt,
             max_tokens=100,
             n=1,
             stop=None,
-            temperature=0.5,
+            temperature=0.6,
         )
 
         gpt_response = response.choices[0].text.strip()
