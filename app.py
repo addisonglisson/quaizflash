@@ -489,7 +489,7 @@ def search_sets():
         search_query = form.search_query.data
 
         # Perform a search for public flashcard sets containing the search query
-        search_results = FlashcardSet.query.filter(FlashcardSet.public == True, FlashcardSet.title.contains(search_query)).all()
+        search_results = FlashcardSet.query.filter(FlashcardSet.public == True, FlashcardSet.title.ilike(search_query)).all()
 
         for result in search_results:
             first_flashcard = Flashcard.query.filter_by(flashcard_set_id=result.id).first()
