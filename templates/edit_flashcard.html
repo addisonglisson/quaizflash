@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block meta_description %}
+<meta name="description" content="Edit your study flashcards to enhance your learning experience.">
+{% endblock %}
 {% block content %}
   <h1>Edit Flashcard</h1>
   <form action="{{ url_for('edit_flashcard', flashcard_id=flashcard.id) }}" method="post">
