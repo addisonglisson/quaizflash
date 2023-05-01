@@ -91,8 +91,9 @@ def fetch_youtube_captions(video_url):
 def index():
     is_logged_in = 'user_id' in session
     print("Session data:", session)
-    return render_template("index.html", search_form=SearchSetsForm())
-
+    if current_user.is_authenticated:
+        return render_template("index.html", search_form=SearchSetsForm())
+  
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -539,6 +540,8 @@ def quiz_set_multiple_choice(set_id):
         })
 
     return render_template('quiz_set_multiple_choice.html', title='Multiple Choice Quiz', flashcard_set=flashcard_set, mc_flashcards=mc_flashcards, search_form=SearchSetsForm())
-
+@app.route("/home", methods=["GET"])
+def home():
+    return render_template("home.html", search_form=SearchSetsForm())
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=False)
