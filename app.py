@@ -545,3 +545,7 @@ def home():
     return render_template("home.html", search_form=SearchSetsForm())
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=False)
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return app.send_static_file('sitemap.xml')
