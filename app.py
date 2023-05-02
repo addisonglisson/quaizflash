@@ -33,7 +33,7 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = "info@quaizflash.com"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SECURITY_PASSWORD_SALT"] = os.environ.get("SECURITY_PASSWORD_SALT")
-app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
+##app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
 
 mail=Mail(app)
 def generate_token(email):
