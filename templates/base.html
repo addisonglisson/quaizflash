@@ -11,6 +11,9 @@
 
    <title>{% block title %}QuaizFlash - AI-Powered Flashcard Learning Platform{% endblock %}</title>
 
+   <link rel="icon" type="image/png" href="{{ url_for('static', filename='qflogo.png') }}" />
+
+
 
    <!-- Add Google Fonts -->
    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -28,7 +31,9 @@
    <header class="main-header">
        <div class="container">
            <nav class="nav">
-               <a href="{{ url_for('index') }}" class="brand">QuAIzFlash</a>
+               <a href="{{ url_for('index') }}" class="brand">
+                   <img src="{{ url_for('static', filename='quaizflashlogo.png') }}" alt="QuAIzFlash Logo" style="height: 70px; width: 120px;">
+               </a>
                <ul class="nav-list">
                 {% if session.logged_in %}
                     {% include '_nav_logged_in.html' %}
@@ -62,6 +67,7 @@
    <footer class="main-footer">
        <div class="container">
            <p>&copy; {{ year }} QuAIzFlash All rights reserved.</p>
+           <p>Contact us: <a href="mailto:info@quaizflash.com">info@quaizflash.com</a></p>
        </div>
    </footer>
 

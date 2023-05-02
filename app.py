@@ -19,10 +19,74 @@ from flask import abort
 from datetime import datetime
 from random import shuffle
 from sqlalchemy.sql.expression import func
-
+from itsdangerous import URLSafeTimedSerializer
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "5a4379b0d0a662d6d1f14b3f6b1e6d92"
+
+app.config["MAIL_SERVER"] = "smtp.office365.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = "info@quaizflash.com"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SECURITY_PASSWORD_SALT"] = os.environ.get("SECURITY_PASSWORD_SALT")
+app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
+
+mail=Mail(app)
+def generate_token(email):
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    return serializer.dumps(email, salt=app.config["SECURITY_PASSWORD_SALT"])
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, salt=app.config["SECURITY_PASSWORD_SALT"], max_age=expiration)
+    except:
+        return False
+    return email
+
+@app.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form["email"]
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = generate_token(user.email)
+            reset_url = url_for("reset_password", token=token, _external=True)
+            send_email(user.email, "Password Reset Request", "email/reset_password", reset_url=reset_url)
+            flash("An email has been sent with instructions to reset your password.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("Invalid email address.", "danger")
+    return render_template("forgot_password.html",search_form=SearchSetsForm())
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(subject, recipients=[to], sender=app.config["MAIL_DEFAULT_SENDER"])
+    msg.body = render_template(f"{template}.txt", **kwargs)
+    msg.html = render_template(f"{template}.html", **kwargs)
+    mail.send(msg)
+
+
+@app.route("/reset_password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    email = confirm_token(token)
+    if not email:
+        flash("The password reset link is invalid or has expired.", "danger")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        password = request.form["password"]
+        user = User.query.filter_by(email=email).first()
+        user.password = generate_password_hash(password)
+        db.session.commit()
+        flash("Your password has been updated.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("reset_password.html",search_form=SearchSetsForm())
+
 openai.api_key = os.environ.get('OPENAI_API_KEY')  # Replace 'OPENAI_API_KEY' with your actual API key variable name
 def get_chatgpt_response(user_message, context=None):
     prompt = f"{context}\nUser: {user_message}\nChatGPT:"
