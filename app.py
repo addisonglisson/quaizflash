@@ -85,7 +85,7 @@ def reset_password(token):
         flash("Your password has been updated.", "success")
         return redirect(url_for("login"))
 
-    return render_template("reset_password.html",search_form=SearchSetsForm())
+    return render_template("reset_password.html", token=token, search_form=SearchSetsForm())
 
 openai.api_key = os.environ.get('OPENAI_API_KEY')  # Replace 'OPENAI_API_KEY' with your actual API key variable name
 def get_chatgpt_response(user_message, context=None):
