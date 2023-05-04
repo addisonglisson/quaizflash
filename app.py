@@ -80,7 +80,7 @@ def reset_password(token):
     if request.method == "POST":
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
-        user.password = generate_password_hash(password)
+        user.set_password(password)
         db.session.commit()
         flash("Your password has been updated.", "success")
         return redirect(url_for("login"))
