@@ -8,7 +8,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(50), nullable=False, unique=True)
-    password_hash = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(250), nullable=False)
     flashcards = db.relationship('Flashcard', backref='user', lazy=True)
     flashcard_sets = db.relationship('FlashcardSet', backref='author', lazy=True)
     
