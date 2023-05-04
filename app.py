@@ -70,7 +70,7 @@ def send_email(to, subject, template, **kwargs):
     mail.send(msg)
 
 
-@app.route("/reset_password/<token>", methods=["GET", "POST"])
+@app.route("/reset_password/<token>/", methods=["GET", "POST"])
 def reset_password(token):
     email = confirm_token(token)
     if not email:
