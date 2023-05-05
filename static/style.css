@@ -554,3 +554,8 @@ table th {
   color: #ffffff;
   font-weight: bold;
 }
+.scrollable-container {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+}
