@@ -609,17 +609,29 @@ table th {
 @media (max-width: 576px) {
   .flashcards-table .btn-sm {
     font-size: 12px;
-    padding: 1.5rem 1.5rem;
+    padding: 0;
     white-space: normal;
+    width: 100%;
   }
 }
 .flashcards-table .btn-sm.add-to-set {
   white-space: normal;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
 }
 .flashcards-table .btn-sm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+.flashcards-table td.actions {
+  padding: 0;
+}
+.flashcards-table td.actions .btn-sm {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+/*.flashcards-table .btn-sm.add-to-set {
+  white-space: normal;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
