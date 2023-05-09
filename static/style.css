@@ -163,17 +163,17 @@ body {
  
  
  .flashcards-table th:nth-child(1) {
-  width: 40%;
+  width: 35%;
  }
  
  
  .flashcards-table th:nth-child(2) {
-  width: 40%;
+  width: 35%;
  }
  
  
  .flashcards-table th:nth-child(3) {
-  width: 20%;
+  width: 30%;
  }
  
  
@@ -596,4 +596,31 @@ table th {
 .content {
     padding-top: 2rem; /* Add padding to the top of the content section */
 }
+}
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-buttons form {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 576px) {
+  .flashcards-table .btn-sm {
+    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+}
+.flashcards-table .btn-sm.add-to-set {
+  white-space: normal;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.flashcards-table .btn-sm {
+  white-space: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
