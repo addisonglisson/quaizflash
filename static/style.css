@@ -603,23 +603,23 @@ table th {
 }
 
 .action-buttons form {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.03rem;
 }
 
 @media (max-width: 576px) {
   .flashcards-table .btn-sm {
     font-size: 12px;
-    padding: 0.25rem 0.5rem;
+    padding: 1rem 1rem;
     margin-bottom: 0.25rem;
+    white-space: normal;
   }
 }
 .flashcards-table .btn-sm.add-to-set {
   white-space: normal;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .flashcards-table .btn-sm {
-  white-space: normal;
   display: inline-flex;
   align-items: center;
   justify-content: center;
