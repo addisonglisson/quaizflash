@@ -605,18 +605,6 @@ table th {
 .action-buttons form {
   margin-bottom: 0.15rem;
 }
-
-@media (max-width: 576px) {
-  .flashcards-table .btn-sm {
-    font-size: 12px;
-    padding: 0;
-    white-space: normal;
-    width: 100%;
-  }
-}
-.flashcards-table .btn-sm.add-to-set {
-  white-space: normal;
-}
 .flashcards-table .btn-sm {
   display: inline-flex;
   align-items: center;
@@ -625,7 +613,23 @@ table th {
 .flashcards-table td.actions {
   padding: 0;
 }
-.flashcards-table td.actions .btn-sm {
+@media (max-width: 576px) {
+  .flashcards-table .btn-sm {
+    font-size: 12px;
+    padding: .25rem ;
+    white-space: normal;
+    width: 4rem;
+  }
+}
+.flashcards-table td.actions {
+  padding: 0;
+}
+.flashcards-table .btn-sm.add-to-set {
+  white-space: normal;
+}
+
+
+/*.flashcards-table td.actions .btn-sm {
   width: 100%;
   padding-left: 0;
   padding-right: 0;
