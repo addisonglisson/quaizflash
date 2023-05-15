@@ -628,14 +628,41 @@ table th {
   white-space: normal;
 }
 
+.matching-quiz-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+}
 
-/*.flashcards-table td.actions .btn-sm {
+.matching-card {
+  box-sizing: border-box;
+  padding: 1 5px;
+}
+
+.card {
   width: 100%;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 25px;  /* Add more padding here */
+  box-sizing: border-box;
+  line-height: 1;  /* Adjust line height */
+  overflow-wrap: break-word; /* this will break long words to the new line */
 }
-/*.flashcards-table .btn-sm.add-to-set {
-  white-space: normal;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+
+@media (max-width: 800px) {
+  .card {
+    font-size: 1em;
+  }
 }
+
+@media (max-width: 600px) {
+  .card {
+    font-size: .9em;
+  }
+}
+
+@media (max-width: 400px) {
+  .card {
+    font-size: 0.7em;
+  }
+}
+
+

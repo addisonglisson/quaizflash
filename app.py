@@ -429,6 +429,9 @@ def quiz(set_id, quiz_mode):
 
     if quiz_mode == "multiple_choice":
         return redirect(url_for('quiz_set_multiple_choice', set_id=set_id))  # Redirect to the multiple choice quiz route
+    elif quiz_mode == "matching":
+        return redirect(url_for('quiz_set_matching', set_id=set_id))  # Redirect to the matching quiz route
+
 
 
     return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode, search_form=SearchSetsForm())
@@ -613,3 +616,24 @@ if __name__ == "__main__":
 @app.route('/sitemap.xml')
 def sitemap():
     return app.send_static_file('sitemap.xml')
+
+@app.route('/quiz-set-matching/<int:set_id>')
+def quiz_set_matching(set_id):
+    flashcard_set = FlashcardSet.query.get(set_id)
+    flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+    cards = []
+    for flashcard in flashcards:
+        cards.append({
+            'type': 'question',
+            'content': flashcard.question,
+            'pair_id': flashcard.id
+        })
+        cards.append({
+            'type': 'answer',
+            'content': flashcard.answer,
+            'pair_id': flashcard.id
+        })
+
+    shuffle(cards)
+
+    return render_template('quiz_matching.html', title='Matching Quiz', flashcard_set=flashcard_set, cards=cards, search_form=SearchSetsForm())

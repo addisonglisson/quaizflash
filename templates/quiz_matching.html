@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="matching-quiz-container">
+    {% for card in cards %}
+      <div class="matching-card">
+        <div class="card" id="{{ card.type }}-{{ card.pair_id }}" data-pair-id="{{ card.pair_id }}">
+          <div class="card-body">
+            {{ card.content }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    const cards = document.querySelectorAll('.card');
+    let firstSelectedCard = null;
+    let secondSelectedCard = null;
+    let isProcessing = false;
+
+    function resetCards() {
+      firstSelectedCard.classList.remove('selected');
+      secondSelectedCard.classList.remove('selected');
+      firstSelectedCard.style.backgroundColor = '';
+      secondSelectedCard.style.backgroundColor = '';
+      firstSelectedCard = null;
+      secondSelectedCard = null;
+      isProcessing = false;
+    }
+
+    function handleCardClick(card) {
+      if (card.classList.contains('selected') || isProcessing) return;
+
+      card.classList.add('selected');
+      card.style.backgroundColor = "lightgreen";
+
+      if (!firstSelectedCard) {
+        firstSelectedCard = card;
+      } else if (!secondSelectedCard) {
+        secondSelectedCard = card;
+        isProcessing = true;
+
+        if (firstSelectedCard.dataset.pairId === secondSelectedCard.dataset.pairId) {
+          firstSelectedCard.style.visibility = 'hidden';
+          secondSelectedCard.style.visibility = 'hidden';
+          firstSelectedCard = null;
+          secondSelectedCard = null;
+          isProcessing = false;
+        } else {
+          setTimeout(() => {
+            resetCards();
+          }, 1000);
+        }
+      }
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => handleCardClick(card));
+    });
+  </script>
+{% endblock %}
+
