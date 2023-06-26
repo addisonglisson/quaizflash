@@ -26,7 +26,7 @@ body {
  
  .main-header {
   background-color: #1c62b1;
-  height: 80px;
+  height: 107px;
   padding-top: 10px;
   display: flex;
   justify-content: space-between;
@@ -664,5 +664,83 @@ table th {
     font-size: 0.7em;
   }
 }
+.user-name {
+  font-size: 2em;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
+.blog-post {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
+.post-card-title {
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.post-card-hr {
+  border: 1px solid black;
+}
+
+.post-card-text {
+  font-family: Arial, sans-serif;
+  text-align: left;
+  color: #030303;
+}
+
+.post-card-subtitle {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.comments-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.card-subtitle {
+  margin-top: 10px; /* adjust this value as needed */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 10rem;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #4e74a2;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: .25rem;
+}
+
+.dropdown-item {
+  display: block;
+  width: 90%;
+  padding: .5rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+.dropdown-item:hover {
+  background-color: #1c62b1; /* Darkened blue */
+  color: #ffffff; /* White text */
+}

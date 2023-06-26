@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -11,7 +12,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(250), nullable=False)
     flashcards = db.relationship('Flashcard', backref='user', lazy=True)
     flashcard_sets = db.relationship('FlashcardSet', backref='author', lazy=True)
-    
+    posts = db.relationship('BlogPost', backref='author', lazy=True)  # Relation to BlogPost
+    comments = db.relationship('Comment', backref='author', lazy=True)  # Relation to Comment
 
 
 
@@ -87,3 +89,17 @@ class FlashcardInteraction(db.Model):
     
     def __repr__(self):
         return f"<FlashcardInteraction {self.id}>"
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    comments = db.relationship('Comment', backref='post', lazy=True)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    content = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('blog_post.id'), nullable=False)

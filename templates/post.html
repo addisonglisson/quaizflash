@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="blog-post">
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <hr class="post-card-hr">
+        <p class="post-card-text">{{ post.content }}</p>
+        <hr class="post-card-hr">
+        <h6 class="post-card-subtitle">Posted by {{ post.author.username }} on {{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
+    </div>
+    <div class="comments-section mt-5">
+        <h3>Comments:</h3>
+        {% for comment in comments %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <p class="card-text">{{ comment.content }}</p>
+                    <h6 class="card-subtitle mb-2 text-muted">Posted by {{ comment.author.username }} on {{ comment.date_posted.strftime('%Y-%m-%d') }}</h6>
+                </div>
+            </div>
+        {% endfor %}
+        <form class="form-inline mt-5" method="POST" action="{{ url_for('post_comment', post_id=post.id) }}">
+            {{ comment_form.hidden_tag() }}
+            <div class="form-group mb-2">
+                {{ comment_form.content.label(class="form-label") }} 
+                {{ comment_form.content(class="form-control", rows=5) }}
+            </div>
+            {{ comment_form.submit(class="btn btn-primary mb-2") }}
+        </form>
+    </div>
+</div>
+{% endblock content %}

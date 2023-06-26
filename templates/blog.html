@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for post in posts %}
+        <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+            <div style="margin-right: 20px;">
+                <img src="{{ url_for('static', filename='qflogo.png') }}" alt="Your logo" style="width: 100px;">
+            </div>
+            <div style="flex: 1;">
+                <h2><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+                <p>{{ post.content[:150] }}...</p>
+                <p>Posted by {{ post.author.username }} on {{ post.date_posted.strftime('%Y-%m-%d') }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    <a href="{{ url_for('create_post') }}" class="btn btn-primary">Create New Post</a>
+{% endblock content %}

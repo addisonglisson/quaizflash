@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% block meta_description %}
+<meta name="description" content="Explore all public flashcard sets on QuaizFlash.">
+{% endblock %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  <div class="scrollable-container">
+    {% for flashcard_set in flashcard_sets.items %}
+      <div class="flashcard-set">
+        <h2><a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}">{{ flashcard_set.title }}</a></h2>
+        <p>{{ flashcard_set.description }}</p>
+        <form method="GET" action="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}" class="inline-form">
+          <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
+        </form>
+        <form method="GET" action="{{ url_for('quiz_searched_set', set_id=flashcard_set.id, quiz_mode='question') }}" class="inline-form">
+          <input type="submit" value="Quiz Set" class="btn btn-sm btn-outline-primary">
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Add pagination links -->
+  {% if flashcard_sets.has_prev %}
+    <a href="{{ url_for('public_sets', page=flashcard_sets.prev_num) }}">Previous</a>
+  {% endif %}
+  {% if flashcard_sets.has_next %}
+    <a href="{{ url_for('public_sets', page=flashcard_sets.next_num) }}">Next</a>
+  {% endif %}
+{% endblock %}

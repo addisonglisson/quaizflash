@@ -23,3 +23,11 @@ class VirtualTutorForm(FlaskForm):
 class SearchSetsForm(FlaskForm):
     search_query = StringField('Search Query', validators=[DataRequired()])
     submit = SubmitField('Search')
+class BlogPostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post')
+
+class CommentForm(FlaskForm):
+    content = TextAreaField('Leave a comment', validators=[DataRequired()])
+    submit = SubmitField('Post Comment')

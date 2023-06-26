@@ -4,12 +4,12 @@ import requests
 import xmltodict
 import re
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
-from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm
+from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -21,6 +21,8 @@ from random import shuffle
 from sqlalchemy.sql.expression import func
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
+from lxml.etree import Element, SubElement, tostring
+from urllib.parse import urljoin
 
 app = Flask(__name__)
 
@@ -548,7 +550,6 @@ def virtual_tutor():
     conversation_history = conversation_history[::-1]
     return render_template('virtual_tutor.html', title='Virtual Tutor', form=form, conversation_history=conversation_history, search_form=SearchSetsForm())
 @app.route('/search_sets', methods=['GET', 'POST'])
-@login_required
 def search_sets():
     form = SearchSetsForm()
     search_results = []
@@ -566,6 +567,7 @@ def search_sets():
     return render_template('search_sets.html', title='Search Public Sets', form=form, search_results=search_results, search_form=SearchSetsForm())
 
 @app.route('/quiz_searched_set/<int:set_id>/<quiz_mode>')
+@login_required
 def quiz_searched_set(set_id, quiz_mode):
     flashcard_set = FlashcardSet.query.get_or_404(set_id)
     flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
@@ -615,8 +617,29 @@ if __name__ == "__main__":
 
 @app.route('/sitemap.xml')
 def sitemap():
-    return app.send_static_file('sitemap.xml')
+    # Define the base url and create the root sitemap element
+    base_url = 'https://www.quaizflash.com'
+    root = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
+    # List of static routes you want to add
+    static_routes = ['login', 'home', 'register', 'flashcard_sets']  
+
+    # Add static routes to sitemap
+    for route in static_routes:
+        url = SubElement(root, "url")
+        SubElement(url, "loc").text = urljoin(base_url, url_for(route))
+        SubElement(url, "changefreq").text = "monthly"
+        SubElement(url, "priority").text = "1.0"
+
+    # Add public flashcard sets to sitemap
+    public_sets = FlashcardSet.query.filter_by(public=True).all()
+    for set in public_sets:
+        url = SubElement(root, "url")
+        SubElement(url, "loc").text = urljoin(base_url, url_for('view_searched_set', set_id=set.id))
+        SubElement(url, "changefreq").text = "weekly"
+        SubElement(url, "priority").text = "0.5"
+
+    return Response(tostring(root, pretty_print=True), content_type='application/xml')
 @app.route('/quiz-set-matching/<int:set_id>')
 def quiz_set_matching(set_id):
     flashcard_set = FlashcardSet.query.get(set_id)
@@ -637,3 +660,42 @@ def quiz_set_matching(set_id):
     shuffle(cards)
 
     return render_template('quiz_matching.html', title='Matching Quiz', flashcard_set=flashcard_set, cards=cards, search_form=SearchSetsForm())
+@app.route('/public_sets', methods=['GET'])
+def public_sets():
+    page = request.args.get('page', 1, type=int)
+    flashcard_sets = FlashcardSet.query.filter_by(public=True).paginate(page=page, per_page=10)
+    return render_template('public_sets.html', title='Public Flashcard Sets', flashcard_sets=flashcard_sets, search_form=SearchSetsForm())
+@app.route('/blog')
+def blog():
+    posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).all()
+    return render_template('blog.html', posts=posts, search_form=SearchSetsForm())
+
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post = BlogPost.query.get_or_404(post_id)
+    comments = Comment.query.filter_by(post_id=post_id).order_by(Comment.date_posted.desc()).all()
+    comment_form = CommentForm()
+    return render_template('post.html', post=post, comments=comments, comment_form=comment_form, search_form=SearchSetsForm())
+
+@app.route('/create_post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    form = BlogPostForm()
+    if form.validate_on_submit():
+        post = BlogPost(title=form.title.data, content=form.content.data, user_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('blog'))
+    return render_template('create_post.html', form=form, search_form=SearchSetsForm())
+@app.route('/post/<int:post_id>/comment', methods=['POST'])
+@login_required
+def post_comment(post_id):
+    post = BlogPost.query.get_or_404(post_id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(content=form.content.data, user_id=current_user.id, post_id=post.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been posted!', 'success')
+    return redirect(url_for('post', post_id=post_id))
