@@ -622,7 +622,7 @@ def sitemap():
     root = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
     # List of static routes you want to add
-    static_routes = ['login', 'home', 'register', 'flashcard_sets']  
+    static_routes = ['login', 'home', 'register', 'blog']  
 
     # Add static routes to sitemap
     for route in static_routes:
@@ -638,7 +638,14 @@ def sitemap():
         SubElement(url, "loc").text = urljoin(base_url, url_for('view_searched_set', set_id=set.id))
         SubElement(url, "changefreq").text = "weekly"
         SubElement(url, "priority").text = "0.5"
-
+    # Add blog posts to sitemap
+    # Add blog posts to sitemap
+    blog_posts = BlogPost.query.all()
+    for post in blog_posts:
+        url = SubElement(root, "url")
+        SubElement(url, "loc").text = urljoin(base_url, url_for('post', post_id=post.id))
+        SubElement(url, "changefreq").text = "weekly"
+        SubElement(url, "priority").text = "0.5"
     return Response(tostring(root, pretty_print=True), content_type='application/xml')
 @app.route('/quiz-set-matching/<int:set_id>')
 def quiz_set_matching(set_id):
