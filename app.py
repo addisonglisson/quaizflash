@@ -23,8 +23,12 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 from lxml.etree import Element, SubElement, tostring
 from urllib.parse import urljoin
+from flaskext.markdown import Markdown
+
 
 app = Flask(__name__)
+
+Markdown(app)
 
 app.config["MAIL_SERVER"] = "smtp.office365.com"
 app.config["MAIL_PORT"] = 587

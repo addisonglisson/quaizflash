@@ -3,7 +3,18 @@
     <form method="POST">
         {{ form.hidden_tag() }}
         {{ form.title.label }} {{ form.title(size=20) }}
-        {{ form.content.label }} {{ form.content(cols=30, rows=5) }}
+
+        <!-- SimpleMDE Text Area -->
+        {{ form.content.label }}
+        <textarea id="content" name="content" style="text-align: left;"></textarea>
+
         {{ form.submit() }}
     </form>
+
+    <!-- Javascript to activate SimpleMDE editor -->
+    <script>
+        var simplemde = new SimpleMDE({ element: document.getElementById("content") });
+        console.log(simplemde);
+    </script>
+
 {% endblock content %}

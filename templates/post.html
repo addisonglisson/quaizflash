@@ -4,7 +4,7 @@
     <div class="blog-post">
         <h2 class="post-card-title">{{ post.title }}</h2>
         <hr class="post-card-hr">
-        <p class="post-card-text">{{ post.content }}</p>
+        <p class="post-card-text">{{ post.content|markdown }}</p>
         <hr class="post-card-hr">
         <h6 class="post-card-subtitle">Posted by {{ post.author.username }} on {{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
     </div>
@@ -18,11 +18,11 @@
                 </div>
             </div>
         {% endfor %}
-        <form class="form-inline mt-5" method="POST" action="{{ url_for('post_comment', post_id=post.id) }}">
+        <form class="form-group mt-5" method="POST" action="{{ url_for('post_comment', post_id=post.id) }}">
             {{ comment_form.hidden_tag() }}
             <div class="form-group mb-2">
-                {{ comment_form.content.label(class="form-label") }} 
-                {{ comment_form.content(class="form-control", rows=5) }}
+                <h4 class="form-label">{{ comment_form.content.label.text }}</h4>
+                {{ comment_form.content(id="comment_content", class="form-control", rows=5) }}
             </div>
             {{ comment_form.submit(class="btn btn-primary mb-2") }}
         </form>
