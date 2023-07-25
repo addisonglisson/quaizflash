@@ -25,7 +25,6 @@ from lxml.etree import Element, SubElement, tostring
 from urllib.parse import urljoin
 from flaskext.markdown import Markdown
 
-
 app = Flask(__name__)
 
 Markdown(app)
