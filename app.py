@@ -676,6 +676,7 @@ def public_sets():
     page = request.args.get('page', 1, type=int)
     flashcard_sets = FlashcardSet.query.filter_by(public=True).paginate(page=page, per_page=10)
     return render_template('public_sets.html', title='Public Flashcard Sets', flashcard_sets=flashcard_sets, search_form=SearchSetsForm())
+
 @app.route('/blog')
 def blog():
     posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).all()
