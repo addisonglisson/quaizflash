@@ -744,3 +744,19 @@ table th {
   background-color: #1c62b1; /* Darkened blue */
   color: #ffffff; /* White text */
 }
+.study-pod {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.pod-title {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+.pod-description {
+  margin-bottom: 10px;
+}

@@ -57,4 +57,18 @@
   {% else %}
     <p>No flashcard sets found.</p>
   {% endif %}
+{% if study_pods %}
+    <h3 class="section-title">My Study Pods</h3>
+    <ul>
+        {% for pod in study_pods %}
+        <div class="study-pod">
+          <p class="pod-title"><strong>{{ pod.name }}</strong></p>
+          <p class="pod-description">{{ pod.description }}</p>
+          <a href="{{ url_for('view_pod', pod_id=pod.id) }}" class="btn btn-sm btn-outline-primary">View Pod</a>
+        </div>
+        {% endfor %}
+    </ul>
+  {% else %}
+    <p>You are not a part of any Study Pods yet.</p>
+{% endif %}
 {% endblock %}

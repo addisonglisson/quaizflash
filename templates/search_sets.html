@@ -15,11 +15,11 @@
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
-    {% if search_results %}
+    {% if flashcard_results %}
       <div class="search-results">
         <h2><span class="search-results-title">Search Results</span></h2>
         <ul>
-        {% for result in search_results %}
+        {% for result in flashcard_results %}
           <li>{{ result.title }}</li>
           <form method="GET" action="{{ url_for('view_searched_set',set_id=result.id ) }}" class="inline-form">
             <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
@@ -31,5 +31,21 @@
         </ul>
       </div>
     {% endif %}
+    {% if studypod_results %}
+  <div class="search-results">
+    <h2><span class="search-results-title">StudyPods</span></h2>
+    <ul>
+    {% for pod in studypod_results %}
+      <li>{{ pod.name }}</li>
+      <form method="GET" action="{{ url_for('view_pod',pod_id=pod.id ) }}" class="inline-form">
+        <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
+      </form>
+      <!-- Add more HTML to interact with the study pods... -->
+    {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+
   </div>
 {% endblock %}

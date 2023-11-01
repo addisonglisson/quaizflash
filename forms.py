@@ -31,3 +31,17 @@ class BlogPostForm(FlaskForm):
 class CommentForm(FlaskForm):
     content = TextAreaField('Leave a comment', validators=[DataRequired()])
     submit = SubmitField('Post Comment')
+
+class CreateStudyPodForm(FlaskForm):
+    name = StringField('Pod Name', validators=[DataRequired()])
+    description = TextAreaField('Description')
+    submit = SubmitField('Create Pod')
+
+class CreateStudyPodPostForm(FlaskForm):
+    title = StringField('Post Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post')
+
+class CreateStudyPodCommentForm(FlaskForm):
+    content = TextAreaField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Comment')

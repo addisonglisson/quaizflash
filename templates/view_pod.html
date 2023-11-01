@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ pod.name }}</h1>
+<p>{{ pod.description }}</p>
+
+<h2>Posts</h2>
+
+{% for post in pod.posts %}
+<div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+    <div style="margin-right: 20px;">
+        <img src="{{ url_for('static', filename='qflogo.png') }}" alt="Your logo" style="width: 100px;">
+    </div>
+    <div style="flex: 1;">
+        <h3><a href="{{ url_for('create_pod_comment', post_id=post.id) }}">{{ post.title }}</a></h3>
+        <p>{{ post.content[:150] }}...</p>
+        <!-- Assuming StudyPodPost has a user_id attribute to determine the author -->
+        <a href="{{ url_for('create_pod_comment', post_id=post.id) }}">Add Comment</a>
+    </div>
+</div>
+{% endfor %}
+<a href="{{ url_for('create_pod_post', pod_id=pod.id) }}" class="btn btn-primary">Add a Post</a>
+
+{% endblock %}

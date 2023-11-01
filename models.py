@@ -5,6 +5,10 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+study_pod_members = db.Table('study_pod_members',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('study_pod_id', db.Integer, db.ForeignKey('study_pod.id'), primary_key=True)
+)
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
@@ -25,6 +29,41 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class StudyPod(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(250), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship fields
+    members = db.relationship('User', secondary=study_pod_members, backref=db.backref('study_pods', lazy=True))
+    posts = db.relationship('StudyPodPost', backref='study_pod', lazy=True)
+    
+    def __repr__(self):
+        return f"<StudyPod {self.name}>"
+
+class StudyPodPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    study_pod_id = db.Column(db.Integer, db.ForeignKey('study_pod.id'), nullable=False)
+    comments = db.relationship('StudyPodComment', backref='post', lazy=True)
+
+    def __repr__(self):
+        return f"<StudyPodPost {self.title}>"
+
+class StudyPodComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    content = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    study_pod_post_id = db.Column(db.Integer, db.ForeignKey('study_pod_post.id'), nullable=False)
+
+    def __repr__(self):
+        return f"<StudyPodComment {self.id}>"
 
 class Flashcard(db.Model):
     id = db.Column(db.Integer, primary_key=True)

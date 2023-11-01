@@ -8,8 +8,8 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
-from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm
+from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment, study_pod_members, StudyPodComment, StudyPod, StudyPodPost
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -226,7 +226,8 @@ def logout():
 def profile():
     flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
     flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
-    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets, search_form=SearchSetsForm())
+    study_pods = current_user.study_pods  
+    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets, study_pods=study_pods,search_form=SearchSetsForm())
 
 @app.route("/ask", methods=["POST"])
 @login_required
@@ -555,19 +556,35 @@ def virtual_tutor():
 @app.route('/search_sets', methods=['GET', 'POST'])
 def search_sets():
     form = SearchSetsForm()
-    search_results = []
+    flashcard_results = []
+    studypod_results = []
 
     if form.validate_on_submit():
         search_query = form.search_query.data
 
-        # Perform a search for public flashcard sets containing the search query
-        search_results = FlashcardSet.query.filter(FlashcardSet.public == True, FlashcardSet.title.ilike(f"%{search_query}%")).all()
+        # Search for public flashcard sets
+        flashcard_results = FlashcardSet.query.filter(
+            FlashcardSet.public == True,
+            FlashcardSet.title.ilike(f"%{search_query}%")
+        ).all()
 
-        for result in search_results:
+        # Search for StudyPods
+        studypod_results = StudyPod.query.filter(
+            StudyPod.name.ilike(f"%{search_query}%")
+        ).all()
+#    search_results = []
+
+ #   if form.validate_on_submit():
+ #       search_query = form.search_query.data
+
+        # Perform a search for public flashcard sets containing the search query
+#        search_results = FlashcardSet.query.filter(FlashcardSet.public == True, FlashcardSet.title.ilike(f"%{search_query}%")).all()
+
+        for result in flashcard_results:
             first_flashcard = Flashcard.query.filter_by(flashcard_set_id=result.id).first()
             result.first_flashcard_id = first_flashcard.id if first_flashcard else None
 
-    return render_template('search_sets.html', title='Search Public Sets', form=form, search_results=search_results, search_form=SearchSetsForm())
+    return render_template('search_sets.html', title='Search Public Sets', form=form, flashcard_results=flashcard_results,studypod_results=studypod_results, search_form=SearchSetsForm())
 
 @app.route('/quiz_searched_set/<int:set_id>/<quiz_mode>')
 @login_required
@@ -710,3 +727,51 @@ def post_comment(post_id):
         db.session.commit()
         flash('Your comment has been posted!', 'success')
     return redirect(url_for('post', post_id=post_id))
+
+@app.route('/create_pod', methods=['GET', 'POST'])
+@login_required
+def create_pod():
+    form = CreateStudyPodForm()
+    if form.validate_on_submit():
+        new_pod = StudyPod(name=form.name.data, description=form.description.data)
+        new_pod.members.append(current_user)
+        db.session.add(new_pod)
+        db.session.commit()
+        flash('Study Pod created successfully!', 'success')
+        return redirect(url_for('view_pod', pod_id=new_pod.id))
+    return render_template('create_pod.html', form=form,search_form=SearchSetsForm())
+
+@app.route('/pod/<int:pod_id>')
+def view_pod(pod_id):
+    pod = StudyPod.query.get_or_404(pod_id)
+    return render_template('view_pod.html', pod=pod,search_form=SearchSetsForm())
+
+@app.route('/pod/<int:pod_id>/post', methods=['GET', 'POST'])
+@login_required
+def create_pod_post(pod_id):
+    form = CreateStudyPodPostForm()
+    pod = StudyPod.query.get_or_404(pod_id)
+    if form.validate_on_submit():
+        post = StudyPodPost(title=form.title.data, content=form.content.data, study_pod=pod, user_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Post added successfully!', 'success')
+        return redirect(url_for('view_pod', pod_id=pod_id))
+    else:
+        print(form.errors)  
+    return render_template('create_pod_post.html', form=form, pod=pod, search_form=SearchSetsForm())
+
+@app.route('/pod_post/<int:post_id>/comment', methods=['GET', 'POST'])
+@login_required
+def create_pod_comment(post_id):
+    form = CreateStudyPodCommentForm()
+    post = StudyPodPost.query.get_or_404(post_id)
+    post_user = User.query.get_or_404(post.user_id)
+    if form.validate_on_submit():
+        comment = StudyPodComment(content=form.content.data, user_id=current_user.id, study_pod_post_id=post.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment added successfully!', 'success')
+        return redirect(url_for('view_pod', pod_id=post.study_pod_id))
+
+    return render_template('create_pod_comment.html', form=form, post=post , post_user=post_user,search_form=SearchSetsForm())   
