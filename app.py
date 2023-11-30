@@ -618,7 +618,12 @@ def quiz_set_multiple_choice(set_id):
 
     for flashcard in flashcards:
         mc_options = [flashcard.answer]
-        wrong_options = Flashcard.query.filter(Flashcard.id != flashcard.id).order_by(func.random()).limit(3).all()
+        wrong_options = Flashcard.query.filter(
+            Flashcard.flashcard_set_id == set_id, 
+            Flashcard.id != flashcard.id
+        ).order_by(func.random()).limit(3).all()
+
+
         mc_options.extend([wrong_option.answer for wrong_option in wrong_options])
         shuffle(mc_options)
 
@@ -775,3 +780,15 @@ def create_pod_comment(post_id):
         return redirect(url_for('view_pod', pod_id=post.study_pod_id))
 
     return render_template('create_pod_comment.html', form=form, post=post , post_user=post_user,search_form=SearchSetsForm())   
+
+@app.route('/join_pod/<int:pod_id>', methods=['POST'])
+@login_required
+def join_pod(pod_id):
+    pod = StudyPod.query.get_or_404(pod_id)
+    if current_user not in pod.members:
+        pod.members.append(current_user)
+        db.session.commit()
+        flash('You have joined the pod!', 'success')
+    else:
+        flash('You are already a member of this pod.', 'info')
+    return redirect(url_for('view_pod', pod_id=pod_id))

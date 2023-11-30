@@ -35,40 +35,54 @@
   </div>
 
 
-  {% if flashcard_sets %}
-    <h3 class="section-title">My Flashcard Sets</h3>
-    <ul>
-        {% for flashcard_set in flashcard_sets %}
-        <div class="flashcard-set">
-          <p class="set-title"><strong>{{ flashcard_set.title }}</strong></p>
-          <p class="set-description">{{ flashcard_set.description }}</p>
-                <form method="GET" action="{{ url_for('new_flashcard', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
-                  <input type="submit" value="Add Flashcard" class="btn btn-sm btn-outline-info">
-                </form>
-                <form method="GET" action="{{ url_for('flashcard_set', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
-                  <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
-                </form>
-                <form method="GET" action="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" style="display: inline;" class="bottom-buttons no-style-form">
-                  <input type="submit" value="Quiz Me" class="btn btn-sm btn-outline-success">
-                </form>                              
+  
+  <div class="container">
+    <div class="row">
+      <!-- Flashcard Sets Section -->
+      {% if flashcard_sets %}
+        <div class="col-md-12">
+          <h3 class="section-title">My Flashcard Sets</h3>
+          <div class="row">
+            {% for flashcard_set in flashcard_sets %}
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ flashcard_set.title }}</h5>
+                    <p class="card-text">{{ flashcard_set.description }}</p>
+                    <a href="{{ url_for('flashcard_set', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">View Set</a>
+                    <a href="{{ url_for('new_flashcard', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">Add Flashcard</a>
+                    <a href="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">Quiz Me</a>
+                  </div>
+                </div>
               </div>
-        {% endfor %}
-    </ul>
-  {% else %}
-    <p>No flashcard sets found.</p>
-  {% endif %}
-{% if study_pods %}
-    <h3 class="section-title">My Study Pods</h3>
-    <ul>
-        {% for pod in study_pods %}
-        <div class="study-pod">
-          <p class="pod-title"><strong>{{ pod.name }}</strong></p>
-          <p class="pod-description">{{ pod.description }}</p>
-          <a href="{{ url_for('view_pod', pod_id=pod.id) }}" class="btn btn-sm btn-outline-primary">View Pod</a>
+            {% endfor %}
+          </div>
         </div>
-        {% endfor %}
-    </ul>
-  {% else %}
-    <p>You are not a part of any Study Pods yet.</p>
-{% endif %}
+      {% else %}
+        <p class="text-center">No flashcard sets found.</p>
+      {% endif %}
+
+      <!-- Study Pods Section -->
+      {% if study_pods %}
+        <div class="col-md-12">
+          <h3 class="section-title">My Study Pods</h3>
+          <div class="row">
+            {% for pod in study_pods %}
+              <div class="col-md-4 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ pod.name }}</h5>
+                    <p class="card-text">{{ pod.description }}</p>
+                    <a href="{{ url_for('view_pod', pod_id=pod.id) }}" class="btn btn-sm btn-outline-primary">View Pod</a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <p class="text-center">You are not a part of any Study Pods yet.</p>
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}

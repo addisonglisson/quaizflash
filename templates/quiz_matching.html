@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="matching-quiz-container">
+<div class="container">
+  <div class="row">
     {% for card in cards %}
-      <div class="matching-card">
-        <div class="card" id="{{ card.type }}-{{ card.pair_id }}" data-pair-id="{{ card.pair_id }}">
+      <!-- Each card takes up 3 columns (out of 12) on large screens and full width on small screens -->
+      <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-4">
+        <div class="card matching-card" id="{{ card.type }}-{{ card.pair_id }}" data-pair-id="{{ card.pair_id }}">
           <div class="card-body">
             {{ card.content }}
           </div>
@@ -12,8 +14,8 @@
       </div>
     {% endfor %}
   </div>
+</div>
 {% endblock %}
-
 
 {% block scripts %}
   {{ super() }}

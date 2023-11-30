@@ -466,8 +466,8 @@ body {
 
 .section .faq-item {
   width: 45%;
-  margin: 15px;
-  padding: 15px;
+  margin: 10px;
+  padding: 10px;
   background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
@@ -628,16 +628,22 @@ table th {
   white-space: normal;
 }
 
-.matching-quiz-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 20px;
+.matching-card .card-body {
+  min-height: 100px; /* Minimum height, cards can expand */
+  padding: 1em; /* Relative padding */
+  display: flex; /* Flexbox for inner alignment */
+  align-items: center; /* Aligns content vertically */
+  justify-content: center; /* Aligns content horizontally */
+  text-align: center; /* Center text */
+  word-wrap: break-word; /* Breaks long words */
+  overflow-wrap: break-word; /* Ensures text wraps inside the card */
 }
 
-.matching-card {
-  box-sizing: border-box;
-  padding: 1 5px;
+.matching-card .card-body p {
+  font-size: 1rem; /* Responsive font size */
+  margin: 0; /* Remove default margin */
 }
+
 
 .card {
   width: 100%;
@@ -759,4 +765,79 @@ table th {
 
 .pod-description {
   margin-bottom: 10px;
+}
+
+.floating-cta {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000; /* Ensure it's above other page elements */
+  border-radius: 50px; /* Makes it pill-shaped */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Optional: adds a bit of shadow for depth */
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.floating-cta:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  text-decoration: none;
+  color: white;
+}
+.features-accordion .accordion-button {
+  background-color: #f8f8f8;
+  color: #333;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+  width: 100%;
+  text-decoration: none;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
+.features-accordion .accordion-button:after {
+  content: '\002B'; /* Unicode character for "+" sign */
+  color: #333;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.features-accordion .accordion-button.collapsed:after {
+  content: "\2212"; /* Unicode character for "-" sign */
+}
+
+.features-accordion .accordion-collapse {
+  border-top: 1px solid #ddd;
+}
+
+.features-accordion .accordion-body {
+  padding: 15px;
+  background-color: #fff;
+}
+.mc-flashcard .card {
+  /* Allow the card to expand vertically as needed */
+  height: auto; 
+  /* Add some padding for better spacing */
+  padding: 15px;
+  /* If you want a minimum height, use min-height instead of height */
+  min-height: 150px; 
+  /* Optional: Add a box shadow or border for better card appearance */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+
+.mc-flashcard .card-body {
+  /* Ensure the card body takes the full height of the card */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribute space between question and options */
+}
+
+.mc-flashcard .options {
+  /* If the options are too many or too long, make them scrollable */
+  overflow-y: auto;
+  max-height: 200px; /* Adjust based on your preference */
+  padding: 10px 0;
 }

@@ -17,35 +17,55 @@
 
     {% if flashcard_results %}
       <div class="search-results">
-        <h2><span class="search-results-title">Search Results</span></h2>
-        <ul>
-        {% for result in flashcard_results %}
-          <li>{{ result.title }}</li>
-          <form method="GET" action="{{ url_for('view_searched_set',set_id=result.id ) }}" class="inline-form">
-            <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
-          </form>
-          <form method="GET" action="{{ url_for('quiz_searched_set',set_id=result.id, quiz_mode='question' ) }}" class="inline-form">
-            <input type="submit" value="Quiz Set" class="btn btn-sm btn-outline-primary">
-          </form>
-        {% endfor %}
-        </ul>
+        <h2>Flashcard Sets</h2>
+        <div class="row">
+          {% for result in flashcard_results %}
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ result.title }}</h5>
+                  <p class="card-text">{{ result.description|truncate(100, true) }}</p>
+                  <a href="{{ url_for('view_searched_set',set_id=result.id ) }}" class="btn btn-sm btn-outline-primary">View Set</a>
+                  <a href="{{ url_for('quiz_searched_set',set_id=result.id, quiz_mode='question' ) }}" class="btn btn-sm btn-outline-primary">Quiz Set</a>
+                </div>
+              </div>
+            </div>
+            {% if loop.index is divisibleby 3 %}
+              <!-- Ad Placement -->
+              <div class="col-md-12 mb-3">
+                <!-- Ad Content Here -->
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
       </div>
     {% endif %}
-    {% if studypod_results %}
-  <div class="search-results">
-    <h2><span class="search-results-title">StudyPods</span></h2>
-    <ul>
-    {% for pod in studypod_results %}
-      <li>{{ pod.name }}</li>
-      <form method="GET" action="{{ url_for('view_pod',pod_id=pod.id ) }}" class="inline-form">
-        <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
-      </form>
-      <!-- Add more HTML to interact with the study pods... -->
-    {% endfor %}
-    </ul>
-  </div>
-{% endif %}
 
+    {% if studypod_results %}
+      <div class="search-results">
+        <h2>StudyPods</h2>
+        <div class="row">
+          {% for pod in studypod_results %}
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ pod.name }}</h5>
+                  <p class="card-text">{{ pod.description|truncate(100, true) }}</p>
+                  <a href="{{ url_for('view_pod',pod_id=pod.id ) }}" class="btn btn-sm btn-outline-primary">View Pod</a>
+                  <a href="{{ url_for('join_pod', pod_id=pod.id) }}" class="btn btn-sm btn-outline-primary">Join Pod</a>
+                </div>
+              </div>
+            </div>
+            {% if loop.index is divisibleby 3 %}
+              <!-- Ad Placement -->
+              <div class="col-md-12 mb-3">
+                <!-- Ad Content Here -->
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
 
   </div>
 {% endblock %}

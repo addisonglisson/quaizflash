@@ -9,6 +9,7 @@ QuaizFlash - Home
 {% block content %}
   <div class="container">
     <h1>Welcome to QuAIzFlash</h1>
+    <div class="dropdown-divider"></div>
     <img src="{{ url_for('static', filename='quaizflashlogo.png') }}" alt="QuaizFlash Logo" style="max-width: 100%; height: auto;">
     <div class="section">
         <div class="discover-future-box" style="border: 2px solid #333; border-radius: 5px; padding: 20px; margin: 10px 0;">
@@ -25,46 +26,149 @@ QuaizFlash - Home
             </p>
         </div>
 
-        <table>
-          <tr>
-            <th>AI-Powered Flashcard Creation</th>
-            <th>Quiz Yourself and Others</th>
-            <th>Virtual Tutor Assistance</th>
-          </tr>
-          <tr>
-            <td>Use AI to generate flashcards from YouTube videos or article URLs, making it easy to filter the content you need and quickly study the information that matters.</td>
-            <td>Test your knowledge by quizzing yourself on your own sets or explore public sets shared by other users.</td>
-            <td>Our AI-driven virtual tutor helps you understand complex subjects and creates personalized learning plans tailored to your needs.</td>
-          </tr>
-        </table>
-        <h1 style="text-align: center; font-size: 32px;">Join QuaizFlash today and revolutionize the way you learn!</h1>
-        <hr>
+        <div class="section features-accordion">
+          <h2>Our Features</h2>
+          <hr>
+          <div id="featuresAccordion">
+        
+            <!-- Feature Item 1 -->
+            <div class="card">
+              <div class="card-header" id="headingOneFeature">
+                <h5 class="mb-0">
+                  <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOneFeature" aria-expanded="true" aria-controls="collapseOneFeature">
+                    AI-Powered Flashcard Creation
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseOneFeature" class="collapse show" aria-labelledby="headingOneFeature">
+                <div class="card-body">
+                  Use AI to generate flashcards from YouTube videos or article URLs, making it easy to filter the content you need and quickly study the information that matters.
+                </div>
+              </div>
+            </div>
+        
+            <!-- Feature Item 2 -->
+            <div class="card">
+              <div class="card-header" id="headingTwoFeature">
+                <h5 class="mb-0">
+                  <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoFeature" aria-expanded="false" aria-controls="collapseTwoFeature">
+                    Quiz Yourself and Others
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseTwoFeature" class="collapse" aria-labelledby="headingTwoFeature">
+                <div class="card-body">
+                  Test your knowledge by quizzing yourself on your own sets or explore public sets shared by other users.
+                </div>
+              </div>
+            </div>
+        
+            <!-- Feature Item 3 -->
+            <div class="card">
+              <div class="card-header" id="headingThreeFeature">
+                <h5 class="mb-0">
+                  <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeFeature" aria-expanded="false" aria-controls="collapseThreeFeature">
+                    Virtual Tutor Assistance
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseThreeFeature" class="collapse" aria-labelledby="headingThreeFeature">
+                <div class="card-body">
+                  Our AI-driven virtual tutor helps you understand complex subjects and creates personalized learning plans tailored to your needs.
+                </div>
+              </div>
+            </div>
+        
+          </div>
+        </div>
+        
+<div class="section">
+  <h2>FAQ</h2>
+  <hr>
+  <div class="accordion" id="faqAccordion">
+    
+    <!-- FAQ Item 1 -->
+    <div class="card">
+      <div class="card-header" id="headingOne">
+        <h5 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            What is QuAIzFlash?
+          </button>
+        </h5>
       </div>
-    <div class="section">
-      <h2>FAQ</h2>
-      <hr>
-      <div class="faqs">
-        <div class="faq-item">
-          <strong>What is QuAIzFlash?</strong>
-          <p>QuAIzFlash is an online platform that uses AI technology to create and share flashcard sets for study purposes, helping users learn more effectively.</p>
-        </div>
-        <div class="faq-item">
-          <strong>How do I create a flashcard set?</strong>
-          <p>To create a flashcard set, register for a free account and then click on "Create Set" in the navigation menu. You can use AI to generate flashcards from YouTube videos, article URLs, or plain text.</p>
-        </div>
-        <div class="faq-item">
-          <strong>Can I make my own flashcards manually?</strong>
-          <p>Yes! If you want to make your own flashcards, just simply use the add flashcard button in your flashcard sets.</p>
-        </div>
-        <div class="faq-item">
-          <strong>What if the AI flashcard is a not exactly what I want?</strong>
-          <p>That is not a probem, you can easily edit or delet flashcards on your profile.</p>
-        </div>
-        <div class="faq-item">
-          <strong>Can I share my flashcard sets with others?</strong>
-          <p>Yes, you can make your flashcard sets public, allowing others to view and quiz themselves on your sets.</p>
+      <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#faqAccordion">
+        <div class="card-body">
+          QuAIzFlash is an online platform that uses AI technology to create and share flashcard sets for study purposes, helping users learn more effectively.
         </div>
       </div>
     </div>
+    
+    <!-- FAQ Item 2 -->
+    <div class="card">
+      <div class="card-header" id="headingTwo">
+        <h5 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            How do I create a flashcard set?
+          </button>
+        </h5>
+      </div>
+      <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#faqAccordion">
+        <div class="card-body">
+          To create a flashcard set, register for a free account and then click on "Create Set" in the navigation menu. You can use AI to generate flashcards from YouTube videos, article URLs, or plain text.
+        </div>
+      </div>
+    </div>
+    
+    <!-- FAQ Item 3 -->
+    <div class="card">
+      <div class="card-header" id="headingThree">
+        <h5 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Can I make my own flashcards manually?
+          </button>
+        </h5>
+      </div>
+      <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#faqAccordion">
+        <div class="card-body">
+          Yes! If you want to make your own flashcards, just simply use the add flashcard button in your flashcard sets.
+        </div>
+      </div>
+    </div>
+    
+    <!-- FAQ Item 4 -->
+    <div class="card">
+      <div class="card-header" id="headingFour">
+        <h5 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            What if the AI flashcard is not exactly what I want?
+          </button>
+        </h5>
+      </div>
+      <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#faqAccordion">
+        <div class="card-body">
+          That is not a problem, you can easily edit or delete flashcards on your profile.
+        </div>
+      </div>
+    </div>
+    
+    <!-- FAQ Item 5 -->
+    <div class="card">
+      <div class="card-header" id="headingFive">
+        <h5 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+            Can I share my flashcard sets with others?
+          </button>
+        </h5>
+      </div>
+      <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#faqAccordion">
+        <div class="card-body">
+          Yes, you can make your flashcard sets public, allowing others to view and quiz themselves on your sets.
+        </div>
+      </div>
+    </div>
+    
   </div>
+</div>
+
+<!-- ... Rest of your content ... -->
 {% endblock %}
