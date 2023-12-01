@@ -62,6 +62,8 @@ class StudyPodComment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     study_pod_post_id = db.Column(db.Integer, db.ForeignKey('study_pod_post.id'), nullable=False)
 
+    user = db.relationship('User', backref=db.backref('studypod_comments', lazy=True))
+
     def __repr__(self):
         return f"<StudyPodComment {self.id}>"
 

@@ -15,7 +15,7 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <p class="card-text">{{ comment.content }}</p>
-                    <h6 class="card-subtitle mb-2 text-muted">Posted by {{ post_user.username }} on {{ comment.date_posted.strftime('%Y-%m-%d') }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Posted by {{ comment.user.username }} on {{ comment.date_posted.strftime('%Y-%m-%d') }}</h6>
                 </div>
             </div>
         {% endfor %}

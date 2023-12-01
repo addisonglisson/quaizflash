@@ -52,7 +52,9 @@
                   <h5 class="card-title">{{ pod.name }}</h5>
                   <p class="card-text">{{ pod.description|truncate(100, true) }}</p>
                   <a href="{{ url_for('view_pod',pod_id=pod.id ) }}" class="btn btn-sm btn-outline-primary">View Pod</a>
-                  <a href="{{ url_for('join_pod', pod_id=pod.id) }}" class="btn btn-sm btn-outline-primary">Join Pod</a>
+                  <form action="{{ url_for('join_pod', pod_id=pod.id) }}" method="POST" class="join-pod-form">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Join Pod</button>
+                </form>
                 </div>
               </div>
             </div>

@@ -841,3 +841,11 @@ table th {
   max-height: 200px; /* Adjust based on your preference */
   padding: 10px 0;
 }
+
+.join-pod-form {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
