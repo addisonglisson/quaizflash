@@ -227,8 +227,22 @@ def profile():
     flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
     flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
     study_pods = current_user.study_pods  
-    return render_template('profile.html', title='Profile', flashcards=flashcards,flashcard_sets=flashcard_sets, study_pods=study_pods,search_form=SearchSetsForm())
+    total_flashcards = len(flashcards)
+    total_sets = len(flashcard_sets)
+    total_pods = len(study_pods)
+    
+    # Fetch recent activities (implement according to your app's logic)
 
+
+    return render_template('profile.html', title='Profile', 
+                           flashcards=flashcards,
+                           flashcard_sets=flashcard_sets, 
+                           study_pods=study_pods,
+                           total_flashcards=total_flashcards,
+                           total_sets=total_sets,
+                           total_pods=total_pods,
+                           search_form=SearchSetsForm())
+ 
 @app.route("/ask", methods=["POST"])
 @login_required
 def ask():
@@ -409,18 +423,21 @@ def select_set(flashcard_id):
     return render_template('select_set.html', title='Select Set', flashcard=flashcard, sets=sets, search_form=SearchSetsForm())
 
 
+@app.route("/new_flashcard", methods=["GET", "POST"])
 @app.route("/flashcard_set/<int:set_id>/new_flashcard", methods=["GET", "POST"])
 @login_required
-def new_flashcard(set_id):
-    flashcard_set = FlashcardSet.query.get_or_404(set_id)
-    if flashcard_set.user_id != current_user.id:
-        abort(403)
+def new_flashcard(set_id=None):
+    if set_id:
+        flashcard_set = FlashcardSet.query.get_or_404(set_id)
+        if flashcard_set.user_id != current_user.id:
+            abort(403)
+
     form = FlashcardForm()
     if form.validate_on_submit():
-        if request.referrer and 'my_flashcards' in request.referrer:
-            flashcard = Flashcard(question=form.question.data, answer=form.answer.data, user_id=current_user.id)
-        else:
+        if set_id:
             flashcard = Flashcard(question=form.question.data, answer=form.answer.data, user_id=current_user.id, flashcard_set_id=set_id)
+        else:
+            flashcard = Flashcard(question=form.question.data, answer=form.answer.data, user_id=current_user.id)
         db.session.add(flashcard)
         db.session.commit()
         flash("Your flashcard has been added!", "success")
@@ -792,3 +809,15 @@ def join_pod(pod_id):
     else:
         flash('You are already a member of this pod.', 'info')
     return redirect(url_for('view_pod', pod_id=pod_id))
+
+@app.route("/leave_pod/<int:pod_id>", methods=["POST"])
+@login_required
+def leave_pod(pod_id):
+    pod = StudyPod.query.get_or_404(pod_id)
+    if current_user in pod.members:
+        pod.members.remove(current_user)
+        db.session.commit()
+        flash('You have left the pod.', 'success')
+    else:
+        flash('You are not a member of this pod.', 'warning')
+    return redirect(url_for('profile'))

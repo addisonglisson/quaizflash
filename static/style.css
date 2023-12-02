@@ -599,11 +599,13 @@ table th {
 }
 .action-buttons {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+    gap: 5px;
 }
 
 .action-buttons form {
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.0rem;
+  align-items: center;
 }
 .flashcards-table .btn-sm {
   display: inline-flex;
@@ -849,3 +851,38 @@ table th {
   border: none;
   box-shadow: none;
 }
+.profile-header {
+  display: flex;
+  flex-direction: row; /* Explicitly setting the direction to row */
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  flex-grow: 1;
+  text-align: left; /* Aligns text to the left */
+}
+
+
+.profile-stats {
+  display: flex;
+}
+
+.stat-box {
+  margin-left: 15px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2em;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.stat-label {
+  font-size: 1em;
+  color: #333;
+}
+
+/* Add more styling as needed */
