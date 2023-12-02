@@ -128,19 +128,24 @@
 
 
       function animateValue(id, start, end, duration) {
-        let range = end - start;
-        let current = start;
-        let increment = end > start? 1 : -1;
-        let stepTime = Math.abs(Math.floor(duration / range));
-        let obj = document.getElementById(id);
-        let timer = setInterval(function() {
-            current += increment;
-            obj.textContent = current;
-            if (current == end) {
-                clearInterval(timer);
-            }
-        }, stepTime);
-      }
+    if (end < 0) end = 0;  // Ensure end value is not less than 0
+    let range = Math.abs(end - start); // Calculate the absolute value of the range
+    let current = start;
+    let increment = end > start ? 1 : -1;
+    let stepTime = Math.abs(Math.floor(duration / range));
+    let obj = document.getElementById(id);
+    let timer = setInterval(function() {
+        current += increment;
+        if ((increment > 0 && current > end) || (increment < 0 && current < end)) {
+            current = end; // Ensure current does not exceed end
+        }
+        obj.textContent = current;
+        if (current === end) {
+            clearInterval(timer);
+        }
+    }, stepTime);
+}
+
     });
   </script>
 {% endblock %}
