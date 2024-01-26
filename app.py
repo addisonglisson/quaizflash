@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment, study_pod_members, StudyPodComment, StudyPod, StudyPodPost
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm, FlashcardGeneratorForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -52,6 +52,12 @@ def confirm_token(token, expiration=3600):
     except:
         return False
     return email
+
+def save_flashcards_to_set(flashcard_data, set_id):
+    for flashcard_info in flashcard_data:
+        flashcard = Flashcard(question=flashcard_info['question'], answer=flashcard_info['answer'], user_id=current_user.id, flashcard_set_id=set_id)
+        db.session.add(flashcard)
+    db.session.commit()
 
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
@@ -96,7 +102,7 @@ openai.api_key = os.environ.get('OPENAI_API_KEY')  # Replace 'OPENAI_API_KEY' wi
 def get_chatgpt_response(user_message, context=None):
     prompt = f"{context}\nUser: {user_message}\nChatGPT:"
     response = openai.Completion.create(
-        engine="text-davinci-002",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=100,
         n=1,
@@ -277,7 +283,7 @@ def ask():
     print(f"Prompt: {prompt}")
 
     response = openai.Completion.create(
-        engine="text-davinci-002",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=100,
         n=1,
@@ -556,7 +562,7 @@ def virtual_tutor():
         history_text = "\n".join([entry['content'] for entry in conversation_history[-10:]])
         prompt = f"ChatGPT, you are an expert {subject} tutor. Please provide accurate, helpful, and easy-to-understand answers to any questions related to {subject}. When possible, include step-by-step explanations or examples to help the user better understand your answers.\n\n{history_text}\n{user_input}"
         response = openai.Completion.create(
-            engine="text-davinci-002",
+            engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
             max_tokens=100,
             n=1,
@@ -821,3 +827,101 @@ def leave_pod(pod_id):
     else:
         flash('You are not a member of this pod.', 'warning')
     return redirect(url_for('profile'))
+
+@app.route('/generate_multiple_flashcards', methods=['GET', 'POST'])
+@login_required
+def generate_flashcards():
+    form = FlashcardGeneratorForm()
+    set_form = FlashcardSetForm()
+    # Retrieve generated flashcards from the session (for displaying after generation)
+    generated_flashcards = session.get('generated_flashcards', [])
+
+    if form.validate_on_submit():
+        topic = form.topic.data
+        user_prompt = form.user_prompt.data
+
+        # Adjust the prompt for multiple flashcards
+        prompt = f"Create a list of flashcards about {topic}. Start each flashcard with 'Q:' for question and 'A:' for answer. Each flashcard should be concise.\n\n{user_prompt}"
+
+        # Call OpenAI's API with the modified prompt
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt=prompt,
+            max_tokens=700,
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+
+        # Parse the response to create flashcards
+        flashcard_pairs = parse_flashcards(response.choices[0].text.strip())
+        # Store the parsed flashcards in the session
+        session['generated_flashcards'] = [{"question": q, "answer": a} for q, a in flashcard_pairs]
+
+        flash('Flashcards generated successfully! Review and save them.', 'success')
+        # Redirect to the same route to display generated flashcards
+        return redirect(url_for('generate_flashcards'))
+
+    if request.method == 'POST':
+        # Check if the 'Create Set' button was clicked
+        if 'create_set' in request.form:
+            if set_form.validate():
+                new_set = FlashcardSet(title=set_form.title.data, description=set_form.description.data, user_id=current_user.id)
+                db.session.add(new_set)
+                db.session.commit()
+                flash("New flashcard set created!", "success")
+                # Assign generated flashcards to the new set
+                save_flashcards_to_set(session.get('generated_flashcards', []), new_set.id)
+                session.pop('generated_flashcards', None)  # Clear session
+                return redirect(url_for("flashcard_set", set_id=new_set.id))
+    
+
+    return render_template('generate_flashcards.html', title='Generate Multiple Flashcards', form=form, set_form=set_form, flashcards=generated_flashcards, search_form=SearchSetsForm())
+
+def parse_flashcards(response_text):
+    flashcard_pairs = []
+    for line in response_text.split('\n'):
+        if line.startswith("Q:"):
+            question = line[2:].strip()
+        elif line.startswith("A:"):
+            answer = line[2:].strip()
+            flashcard_pairs.append((question, answer))
+    return flashcard_pairs
+
+
+@app.route('/save_generated_flashcards', methods=['POST'])
+@login_required
+def save_generated_flashcards():
+    generated_flashcards = session.pop('generated_flashcards', [])
+    if generated_flashcards:
+        for flashcard in generated_flashcards:
+            new_flashcard = Flashcard(question=flashcard['question'], answer=flashcard['answer'], user_id=current_user.id)
+            db.session.add(new_flashcard)
+        db.session.commit()
+        flash('Flashcards saved to your profile!', 'success')
+    else:
+        flash('No flashcards to save.', 'info')
+
+    return redirect(url_for('profile'))
+
+@app.route('/edit_generated_flashcards', methods=['GET', 'POST'])
+@login_required
+def edit_generated_flashcards():
+    generated_flashcards = session.get('generated_flashcards', [])
+
+    if request.method == 'POST':
+        # Process the edited flashcards
+        edited_flashcards = []
+        for i in range(len(generated_flashcards)):
+            question = request.form.get(f'question-{i}')
+            answer = request.form.get(f'answer-{i}')
+            edited_flashcards.append({'question': question, 'answer': answer})
+        
+        # Update the session with edited flashcards
+        session['generated_flashcards'] = edited_flashcards
+        flash('Flashcards updated!', 'success')
+
+        # Redirect back to the generate flashcards page to review edited flashcards
+        return redirect(url_for('generate_flashcards'))
+
+    return render_template('edit_generated_flashcards.html', flashcards=generated_flashcards, search_form=SearchSetsForm())

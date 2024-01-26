@@ -25,8 +25,11 @@
       </div>
     </div>
   </div>
+<div class="pulsating-line"></div>
+
 
   <h3 class="section-title">My Flashcards</h3>
+  <div class="pulsating-line"></div>
   <div class="scrollable-container">
     <div class="row">
       {% for flashcard in flashcards %}
@@ -59,7 +62,9 @@
       <!-- Flashcard Sets Section -->
       {% if flashcard_sets %}
         <div class="col-md-12">
+          <div class="pulsating-line"></div>
           <h3 class="section-title">My Flashcard Sets</h3>
+          <div class="pulsating-line"></div>
           <div class="row">
             {% for flashcard_set in flashcard_sets %}
               <div class="col-md-4 mb-3">
@@ -87,7 +92,9 @@
       <!-- Study Pods Section -->
       {% if study_pods %}
         <div class="col-md-12">
+          <div class="pulsating-line"></div>
           <h3 class="section-title">My Study Pods</h3>
+          <div class="pulsating-line"></div>
           <div class="row">
             {% for pod in study_pods %}
               <div class="col-md-4 mb-3">

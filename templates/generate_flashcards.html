@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Generate Mutliple Flashcards!</h1>
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.topic.label(class="form-control-label") }}
+            {{ form.topic(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.user_prompt.label(class="form-control-label") }}
+            {{ form.user_prompt(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+
+    <!-- Display generated flashcards for review -->
+    {% if flashcards %}
+        <h3 class="section-title">Generated Flashcards</h3>
+        <div class="scrollable-container">
+            <div class="row">
+                {% for flashcard in flashcards %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ flashcard.question }}</h5>
+                                <p class="card-text">{{ flashcard.answer }}</p>
+                                <!-- Action buttons can be modified as per the requirement -->
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="button-group" style="display: flex; justify-content: center; gap: 10px;">
+                <form action="{{ url_for('edit_generated_flashcards') }}" method="get">
+                    <button type="submit" class="btn btn-primary">Edit Flashcards</button>
+                </form>
+                <form method="POST" action="{{ url_for('save_generated_flashcards') }}">
+                    <button type="submit" class="btn btn-primary">Save Flashcards</button>
+                </form>
+            </div>
+    {% endif %}
+</div>
+<h3>Create a New Flashcard Set for these Flashcards</h3>
+<form method="POST" action="">
+    {{ set_form.hidden_tag() }}
+    <div class="form-group">
+        <label for="{{ set_form.title.id }}">Title</label>
+        {{ set_form.title(class="form-control") }}
+    </div>
+    <div class="form-group">
+        <label for="{{ set_form.description.id }}">Description</label>
+        {{ set_form.description(class="form-control", rows=5) }}
+    </div>
+    <button type="submit" name="create_set" class="btn btn-primary">Create Set and Save Flashcards</button>
+</form>
+{% endblock %}

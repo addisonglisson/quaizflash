@@ -886,3 +886,44 @@ table th {
 }
 
 /* Add more styling as needed */
+.animated-gradient-line {
+  height: 3px;
+  background: linear-gradient(270deg, #ff70a3, #ff9770, #ffd670, #e9ff70);
+  background-size: 800% 800%;
+  animation: GradientMove 8s ease infinite;
+  margin: 20px 0;
+}
+
+@keyframes GradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.pulsating-line {
+  height: 3px;
+  background: #0f0e0e;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.pulsating-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 300%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #1f40ad, transparent);
+  animation: pulse 1.5s infinite linear;
+}
+
+@keyframes pulse {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 100%;
+  }
+}

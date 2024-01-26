@@ -45,3 +45,8 @@ class CreateStudyPodPostForm(FlaskForm):
 class CreateStudyPodCommentForm(FlaskForm):
     content = TextAreaField('Comment', validators=[DataRequired()])
     submit = SubmitField('Comment')
+
+class FlashcardGeneratorForm(FlaskForm):
+    topic = StringField('Topic', validators=[DataRequired()])
+    user_prompt = StringField('Prompt', validators=[DataRequired()])
+    submit = SubmitField('Generate Flashcards')
