@@ -1,31 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container">
+<div class="container">
     <h1>Progress</h1>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Flashcard Set</th>
-          <th scope="col">Study Sessions</th>
-          <th scope="col">Total Time Spent</th>
-          <th scope="col">Correct Answers</th>
-          <th scope="col">Incorrect Answers</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="pulsating-line"></div>
+    <div class="progress-accordion">
         {% for set_id, data in progress_data.items() %}
-          <tr>
-            <td>{{ data.set_title }}</td>
-            <td>{{ data.total_sessions }}</td>
-            <td>{{ data.total_time_spent }} seconds</td>
-            <td>{{ data.total_correct }}</td>
-            <td>{{ data.total_incorrect }}</td>
-          </tr>
+        <div class="accordion-item">
+            <button class="accordion-button" onclick="toggleAccordion(this)">
+                {{ data.set_title }} 
+            </button>
+            <div class="accordion-content">
+              <!-- Statistical Data -->
+              <div class="stat-item">
+                  <i class="fa fa-clock-o" aria-hidden="true"></i>
+                  <span>Total Time Spent:</span>
+                  <strong>{{ data.total_time_spent }} seconds</strong>
+              </div>
+              <div class="stat-item">
+                  <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  <span>Correct Answers:</span>
+                  <strong>{{ data.total_correct }}</strong>
+              </div>
+              <div class="stat-item">
+                  <i class="fa fa-times-circle" aria-hidden="true"></i>
+                  <span>Incorrect Answers:</span>
+                  <strong>{{ data.total_incorrect }}</strong>
+              </div>
+              <!-- Chart Container for Set -->
+              <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+                  <canvas id="chart{{ set_id }}"></canvas>
+              </div>
+          </div>
+        </div>
         {% endfor %}
-      </tbody>
-    </table>
+    </div>
+</div>
+{% endblock %}
 
-  </div>
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function toggleAccordion(button) {
+        var content = button.nextElementSibling;
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            button.classList.remove('active');
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            button.classList.add('active');
+        }
+    }
+
+    // Generate Charts
+    {% for set_id, data in progress_data.items() %}
+        var ctx = document.getElementById('chart{{ set_id }}').getContext('2d');
+        var chart{{ set_id }} = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [{{ data.total_correct }}, {{ data.total_incorrect }}],
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    {% endfor %}
+</script>
 {% endblock %}

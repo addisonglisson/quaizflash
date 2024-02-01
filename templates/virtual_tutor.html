@@ -3,6 +3,7 @@
 {% block content %}
   <div class="container">
     <h1>Virtual Tutor</h1>
+    <div class="pulsating-line"></div>
 
     <form method="POST" action="{{ url_for('virtual_tutor') }}">
       {{ form.csrf_token }}

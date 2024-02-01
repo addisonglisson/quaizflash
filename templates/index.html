@@ -2,7 +2,9 @@
 
 {% block content %}
   <div class="container">
+    <div class="pulsating-line"></div>
     <h1>Start Building Your AI Flashcards</h1>
+    <div class="pulsating-line"></div>
     {% if current_user.is_authenticated %}
     <form id="question-form" class="form">
         <div class="form-group">
@@ -25,11 +27,13 @@
     <a class="btn btn-custom" href="{{ url_for('create_flashcard_set') }}">Create Flashcard Set</a>
     <br><br>
     <h2>Answer</h2>
+    <div class="pulsating-line"></div>
     <div id="answer"></div>
     <br>
     <button id="save-flashcard" class="btn btn-custom">Create Flashcard</button>
     <br><br>
     <h2>Your Flashcards</h2>
+    <div class="pulsating-line"></div>
     <div id="flashcard-container"></div>
     </form>
 {% else %}

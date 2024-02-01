@@ -191,7 +191,7 @@ body {
  }
  .nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   height: 100%;
  }
@@ -206,7 +206,8 @@ body {
  
  
  .nav-item {
-  margin-left: 15px;
+  margin-left: 10.5px;
+  color: #f0f0f0;
  }
  
  
@@ -275,7 +276,7 @@ body {
  }
  .card {
   width: 300px;
-  height: 200px;
+ 
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -926,4 +927,224 @@ table th {
   100% {
     left: 100%;
   }
+}
+
+.progress-table {
+  margin-top: 20px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.progress-table-header, .progress-table-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 0;
+}
+
+.progress-table-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.progress-table-row:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.progress-table-row:nth-child(even) {
+  background-color: #ffffff;
+}
+.accordion-item {
+  margin-bottom: 10px;
+}
+
+.accordion-button {
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: background-color 0.6s ease;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.accordion-button.active, .accordion-button:hover {
+  background-color: #0056b3;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f9f9f9;
+  padding: 0 18px;
+}
+
+.accordion-content .stat-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.accordion-content .stat-item i {
+  margin-right: 10px;
+  color: #007bff; /* Adjust color as needed */
+}
+
+.accordion-content .stat-item span {
+  flex-grow: 1;
+}
+
+.accordion-content .stat-item strong {
+  font-weight: bold;
+  color: #333; /* Adjust color as needed */
+}
+
+.graph-container {
+  height: 300px; /* Placeholder for graph height */
+  margin-top: 20px;
+}
+
+.navbar-nav .nav-link, .navbar-brand {
+  color: #ffffff !important;
+}
+
+.navbar-brand img {
+  height: auto;
+  max-height: 100%;
+  width: auto;
+}
+
+.navbar-nav {
+  justify-content: center;
+  width: 100%;
+}
+
+/* Targeting only the search form within the navbar */
+.navbar .form-inline {
+  background-color: transparent; /* Remove the background */
+  padding: 0; /* Remove padding */
+  border-radius: 0; /* Remove border radius */
+  box-shadow: none; /* Remove box shadow */
+}
+
+/* Customizing the search input within the navbar */
+.navbar .form-inline .form-control {
+  border: 1px solid #ccc; /* Optional: Add border to the input */
+  background-color: #f8f6f6; /* Make the input background transparent */
+  box-shadow: none; /* Remove box shadow from input */
+}
+
+/* Customizing the search button within the navbar */
+.navbar .form-inline .btn {
+  border: 1px solid #f2efef; /* Optional: Add border to the button */
+  background-color: transparent; /* Change to your desired button color */
+  color: #ffffff; /* Change to your desired button text color */
+  font-size: 1.3rem;
+}
+.main-header .navbar .container {
+  width: 100%;
+  min-width: 100%;
+}
+.navbar .container, .navbar .container-fluid {
+  width: 100%;
+}
+
+.navbar-collapse {
+  justify-content: center;
+  flex-grow: 1;
+  text-align: center;
+}
+.navbar {
+  width: 100%;
+}
+
+.floating-action-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+}
+
+.floating-main {
+  display: block;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #2b8eff; /* Your primary color */
+  color: white;
+  text-align: center;
+  line-height: 30px;
+  font-size: 30px;
+  transition: transform 0.2s;
+}
+
+.floating-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none;
+  position: absolute;
+  bottom: 60px; /* Height of the main button */
+  left: 0;
+}
+
+.floating-menu li a {
+  display: block;
+  margin: 5px 0;
+  background: rgb(235, 235, 235);
+  color: #333;
+  padding: 10px;
+  border-radius: 50px;
+  text-align: left;
+  width: 200px; /* Width of the dropdown items */
+  transition: all 0.3s;
+}
+
+.floating-menu li a:hover {
+  background: #b6bcdee2;
+}
+
+.profile-picture-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.avatar-selection {
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.avatar:hover {
+  opacity: 0.7;
+}
+
+.name-input {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.update-profile-btn {
+  margin-top: 10px;
+}
+.profile-picture img {
+  border-radius: 50%; /* Makes the image round */
+  float: left; /* Floats the image to the left */
+  margin-right: 20px; /* Adds space to the right of the image */
+  width: 100px; /* Adjust the size as needed */
+  height: 100px; /* Adjust the size as needed */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
 }

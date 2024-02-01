@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Study Pods</h1>
+        <div class="pulsating-line"></div>
+        {% for pod in study_pods %}
+            <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+                <div style="margin-right: 20px;">
+                    <!-- Add an image or logo for each StudyPod if available -->
+                    <img src="{{ url_for('static', filename='qflogo.png') }}" alt="{{ pod.name }}" style="width: 100px;">
+                </div>
+                <div style="flex: 1;">
+                    <h2><a href="{{ url_for('view_pod', pod_id=pod.id) }}">{{ pod.name }}</a></h2>
+                    <p>{{ pod.description|truncate(150, true) }}</p>
+                    <p>Created on {{ pod.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+            </div>
+        {% endfor %}
+        <!-- You can add a button to create a new StudyPod if that's a feature of your application -->
+        <!-- <a href="{{ url_for('create_pod') }}" class="btn btn-primary">Create New Study Pod</a> -->
+    </div>
+{% endblock content %}

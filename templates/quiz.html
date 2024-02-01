@@ -44,13 +44,12 @@
     const incorrectBtn = document.querySelector('#incorrect-btn');
     const submitBtn = document.querySelector('#submit-btn');
     let currentFlashcardIndex = 0;
+    let startTime = new Date(); // Start time for each flashcard
     const counter = document.querySelector('#counter');
 
     function updateCounter() {
       counter.innerText = `${currentFlashcardIndex + 1}/${flashcards.length}`;
     }
-
-
 
     function showFlashcard(index) {
       flashcards.forEach((flashcard, i) => {
@@ -69,27 +68,31 @@
           answer.style.display = 'block';
         }
       });
+      startTime = new Date(); // Reset the start time for the new flashcard
+      updateCounter();
     }
 
     prevBtn.addEventListener('click', () => {
-      currentFlashcardIndex--;
-      showFlashcard(currentFlashcardIndex);
+      if (currentFlashcardIndex > 0) {
+        currentFlashcardIndex--;
+        showFlashcard(currentFlashcardIndex);
+      }
       nextBtn.disabled = false;
       if (currentFlashcardIndex === 0) {
         prevBtn.disabled = true;
       }
-      updateCounter();
     });
 
     nextBtn.addEventListener('click', () => {
-      currentFlashcardIndex++;
-      showFlashcard(currentFlashcardIndex);
+      if (currentFlashcardIndex < flashcards.length - 1) {
+        currentFlashcardIndex++;
+        showFlashcard(currentFlashcardIndex);
+      }
       prevBtn.disabled = false;
       if (currentFlashcardIndex === flashcards.length - 1) {
         nextBtn.disabled = true;
         submitBtn.style.display = 'block';
       }
-      updateCounter();
     });
 
     flipBtn.addEventListener('click', () => {
@@ -101,10 +104,14 @@
       question.style.display = isQuestionVisible ? 'none' : 'block';
       answer.style.display = isQuestionVisible ? 'block' : 'none';
     });
-    async function submitAnswer(correct, timeSpent, quizFinished = false) {
+
+    async function submitAnswer(correct, quizFinished = false) {
       const currentFlashcard = flashcards[currentFlashcardIndex];
       const flashcardId = currentFlashcard.id.split('-')[1];
       const set_id = "{{ flashcard_set.id }}";
+      const endTime = new Date();
+      const timeSpent = Math.floor((endTime - startTime) / 1000); // Calculate time spent on the flashcard in seconds
+
       const response = await fetch('/submit_interaction', {
         method: 'POST',
         headers: {
@@ -114,7 +121,7 @@
           set_id: set_id,
           flashcard_id: flashcardId,
           correct: correct,
-          time_spent: 0,
+          time_spent: timeSpent,
           quiz_finished: quizFinished
         })
       });
@@ -135,11 +142,10 @@
     });
 
     submitBtn.addEventListener('click', () => {
-      submitAnswer(null, null, true);
+      submitAnswer(null, true);
       window.location.href = '/progress'; // Redirect to the progress page
     });
 
     showFlashcard(currentFlashcardIndex);
-
   </script>
 {% endblock %}

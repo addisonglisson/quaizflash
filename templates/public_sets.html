@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% block meta_description %}
 <meta name="description" content="Explore all public flashcard sets on QuaizFlash.">
 {% endblock %}
@@ -7,14 +7,21 @@
   <div class="scrollable-container">
     {% for flashcard_set in flashcard_sets.items %}
       <div class="flashcard-set">
-        <h2><a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}">{{ flashcard_set.title }}</a></h2>
-        <p>{{ flashcard_set.description }}</p>
-        <form method="GET" action="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}" class="inline-form">
-          <input type="submit" value="View Set" class="btn btn-sm btn-outline-primary">
-        </form>
-        <form method="GET" action="{{ url_for('quiz_searched_set', set_id=flashcard_set.id, quiz_mode='question') }}" class="inline-form">
-          <input type="submit" value="Quiz Set" class="btn btn-sm btn-outline-primary">
-        </form>
+        <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+          <!-- User Avatar -->
+          <div style="margin-right: 20px;">
+            <img src="{{ url_for('static', filename=flashcard_set.author.avatar if flashcard_set.author.avatar else 'default_avatar.png') }}" alt="User Avatar" style="width: 100px;">
+          </div>
+          <!-- Flashcard Set Info -->
+          <div style="flex: 1;">
+            <h2><a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}">{{ flashcard_set.title }}</a></h2>
+            <p>{{ flashcard_set.description }}</p>
+            <p>Created by: {{ flashcard_set.author.username }}</p>
+            <div class="set-actions"></div>
+              <a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">View Set</a>
+              <a href="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">Quiz Me</a>
+          </div>
+        </div>
       </div>
     {% endfor %}
   </div>

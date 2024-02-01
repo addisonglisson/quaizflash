@@ -227,19 +227,25 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    if request.method == 'POST':
+        selected_avatar = request.form.get('avatar')
+        if selected_avatar:
+            current_user.avatar = selected_avatar
+            db.session.commit()
+            flash('Avatar updated successfully!', 'success')
+        return redirect(url_for('profile'))
+
     flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
     flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
     study_pods = current_user.study_pods  
     total_flashcards = len(flashcards)
     total_sets = len(flashcard_sets)
     total_pods = len(study_pods)
-    
-    # Fetch recent activities (implement according to your app's logic)
 
-
+    avatars = ['avatar1.png', 'avatar2.png', 'avatar3.png','avatar4.png','avatar5.png','avatar6.png','avatar7.png','avatar8.png']  # Replace with your avatars' filenames
     return render_template('profile.html', title='Profile', 
                            flashcards=flashcards,
                            flashcard_sets=flashcard_sets, 
@@ -247,7 +253,9 @@ def profile():
                            total_flashcards=total_flashcards,
                            total_sets=total_sets,
                            total_pods=total_pods,
+                           avatars=avatars,
                            search_form=SearchSetsForm())
+
  
 @app.route("/ask", methods=["POST"])
 @login_required
@@ -451,10 +459,13 @@ def new_flashcard(set_id=None):
     return render_template("new_flashcard.html", title="New Flashcard", form=form, legend="New Flashcard", search_form=SearchSetsForm())
 
 @app.route('/quiz/<int:set_id>/<quiz_mode>')
+@login_required
 def quiz(set_id, quiz_mode):
     # You'll need to fetch the flashcard set and its cards from the database here
     flashcard_set = FlashcardSet.query.get(set_id)
     flashcards = Flashcard.query.filter_by(flashcard_set_id=set_id).all()
+
+
 
     if quiz_mode == "multiple_choice":
         return redirect(url_for('quiz_set_multiple_choice', set_id=set_id))  # Redirect to the multiple choice quiz route
@@ -466,6 +477,7 @@ def quiz(set_id, quiz_mode):
     return render_template('quiz.html', title='Quiz', flashcard_set=flashcard_set, flashcards=flashcards, quiz_mode=quiz_mode, search_form=SearchSetsForm())
 
 @app.route('/quiz-settings/<int:set_id>', methods=['GET', 'POST'])
+@login_required
 def quiz_settings(set_id):
     if request.method == 'POST':
         quiz_mode = request.form.get('quiz_mode')
@@ -497,7 +509,7 @@ def submit_interaction():
 
     if quiz_finished:
         study_session.end_time = datetime.utcnow()
-
+    
     db.session.commit()
 
     return {'status': 'success'}
@@ -518,7 +530,6 @@ def update_flashcard():
     db.session.commit()
 
     return jsonify({'message': 'Flashcard updated successfully'})
-
 @app.route('/progress')
 @login_required
 def progress():
@@ -547,7 +558,6 @@ def progress():
                 progress_data[session.flashcard_set_id]['total_incorrect'] += 1
 
     return render_template('progress.html', title='Progress', progress_data=progress_data, search_form=SearchSetsForm())
-
 @app.route('/virtual_tutor', methods=['GET', 'POST'])
 @login_required
 def virtual_tutor():
@@ -608,7 +618,6 @@ def search_sets():
             result.first_flashcard_id = first_flashcard.id if first_flashcard else None
 
     return render_template('search_sets.html', title='Search Public Sets', form=form, flashcard_results=flashcard_results,studypod_results=studypod_results, search_form=SearchSetsForm())
-
 @app.route('/quiz_searched_set/<int:set_id>/<quiz_mode>')
 @login_required
 def quiz_searched_set(set_id, quiz_mode):
@@ -715,11 +724,14 @@ def quiz_set_matching(set_id):
     shuffle(cards)
 
     return render_template('quiz_matching.html', title='Matching Quiz', flashcard_set=flashcard_set, cards=cards, search_form=SearchSetsForm())
-@app.route('/public_sets', methods=['GET'])
+@app.route('/public_sets')
 def public_sets():
     page = request.args.get('page', 1, type=int)
-    flashcard_sets = FlashcardSet.query.filter_by(public=True).paginate(page=page, per_page=10)
-    return render_template('public_sets.html', title='Public Flashcard Sets', flashcard_sets=flashcard_sets, search_form=SearchSetsForm())
+    flashcard_sets = FlashcardSet.query.join(User, FlashcardSet.user_id == User.id)\
+        .filter(FlashcardSet.public == True)\
+        .order_by(FlashcardSet.id.desc())\
+        .paginate(page=page, per_page=10)
+    return render_template('public_sets.html', title='Public Flashcard Sets', flashcard_sets=flashcard_sets, search_form=SearchSetsForm()) 
 
 @app.route('/blog')
 def blog():
@@ -773,6 +785,12 @@ def create_pod():
 def view_pod(pod_id):
     pod = StudyPod.query.get_or_404(pod_id)
     return render_template('view_pod.html', pod=pod,search_form=SearchSetsForm())
+
+@app.route('/study_pods')
+def study_pods():
+    # Fetch all StudyPods from the database
+    all_pods = StudyPod.query.all()
+    return render_template('study_pods.html', study_pods=all_pods, search_form=SearchSetsForm())
 
 @app.route('/pod/<int:pod_id>/post', methods=['GET', 'POST'])
 @login_required
@@ -833,17 +851,27 @@ def leave_pod(pod_id):
 def generate_flashcards():
     form = FlashcardGeneratorForm()
     set_form = FlashcardSetForm()
-    # Retrieve generated flashcards from the session (for displaying after generation)
     generated_flashcards = session.get('generated_flashcards', [])
 
     if form.validate_on_submit():
         topic = form.topic.data
-        user_prompt = form.user_prompt.data
+        num_flashcards = form.num_flashcards.data
+        question = form.question.data
+        article_text = form.article_text.data
+        url = form.url.data
+        article = ""
 
-        # Adjust the prompt for multiple flashcards
-        prompt = f"Create a list of flashcards about {topic}. Start each flashcard with 'Q:' for question and 'A:' for answer. Each flashcard should be concise.\n\n{user_prompt}"
+        if url:
+            if "youtube.com" in url or "youtu.be" in url:
+                article = fetch_youtube_captions(url)
+            else:
+                article = fetch_url_content(url)
+        elif article_text:
+            article = article_text
 
-        # Call OpenAI's API with the modified prompt
+        prompt = f"Topic: {topic}\n\n{question}\n\n{article}\n\nCreate a list of {num_flashcards} flashcards about {topic}. Start each flashcard with 'Q:' for question and 'A:' for answer. Each flashcard should be concise."
+        print(f"Sending prompt to API: {prompt}")
+
         response = openai.Completion.create(
             engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
@@ -853,14 +881,12 @@ def generate_flashcards():
             temperature=0.5,
         )
 
-        # Parse the response to create flashcards
         flashcard_pairs = parse_flashcards(response.choices[0].text.strip())
-        # Store the parsed flashcards in the session
         session['generated_flashcards'] = [{"question": q, "answer": a} for q, a in flashcard_pairs]
 
         flash('Flashcards generated successfully! Review and save them.', 'success')
-        # Redirect to the same route to display generated flashcards
         return redirect(url_for('generate_flashcards'))
+
 
     if request.method == 'POST':
         # Check if the 'Create Set' button was clicked

@@ -2,8 +2,10 @@
 
 {% block content %}
 <div class="container">
-    <h1>Generate Mutliple Flashcards!</h1>
+    <h1>Generate Multiple Flashcards!</h1>
+    <div class="pulsating-line"></div>
 
+    <!-- Flashcard generation form -->
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="form-group">
@@ -11,9 +13,25 @@
             {{ form.topic(class="form-control form-control-lg") }}
         </div>
         <div class="form-group">
-            {{ form.user_prompt.label(class="form-control-label") }}
-            {{ form.user_prompt(class="form-control form-control-lg") }}
+            {{ form.num_flashcards.label(class="form-control-label") }}
+            {{ form.num_flashcards(class="form-control form-control-lg") }}
         </div>
+
+        <!-- New fields for question, article text, and URL -->
+        <div class="form-group">
+            {{ form.question.label(class="form-control-label") }}
+            {{ form.question(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.article_text.label(class="form-control-label") }}
+            {{ form.article_text(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.url.label(class="form-control-label") }}
+            {{ form.url(class="form-control form-control-lg") }}
+        </div>
+
+        <!-- Submit button -->
         <div class="form-group">
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
@@ -22,6 +40,7 @@
     <!-- Display generated flashcards for review -->
     {% if flashcards %}
         <h3 class="section-title">Generated Flashcards</h3>
+        <div class="pulsating-line"></div>
         <div class="scrollable-container">
             <div class="row">
                 {% for flashcard in flashcards %}
@@ -45,18 +64,21 @@
                 </form>
             </div>
     {% endif %}
+
+    <!-- Form to create a new flashcard set -->
+    <h3>Create a New Flashcard Set for these Flashcards</h3>
+    <div class="pulsating-line"></div>
+    <form method="POST" action="">
+        {{ set_form.hidden_tag() }}
+        <div class="form-group">
+            <label for="{{ set_form.title.id }}">Title</label>
+            {{ set_form.title(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="{{ set_form.description.id }}">Description</label>
+            {{ set_form.description(class="form-control", rows=5) }}
+        </div>
+        <button type="submit" name="create_set" class="btn btn-primary">Create Set and Save Flashcards</button>
+    </form>
 </div>
-<h3>Create a New Flashcard Set for these Flashcards</h3>
-<form method="POST" action="">
-    {{ set_form.hidden_tag() }}
-    <div class="form-group">
-        <label for="{{ set_form.title.id }}">Title</label>
-        {{ set_form.title(class="form-control") }}
-    </div>
-    <div class="form-group">
-        <label for="{{ set_form.description.id }}">Description</label>
-        {{ set_form.description(class="form-control", rows=5) }}
-    </div>
-    <button type="submit" name="create_set" class="btn btn-primary">Create Set and Save Flashcards</button>
-</form>
 {% endblock %}

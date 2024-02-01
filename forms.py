@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import StringField, TextAreaField, SubmitField, IntegerField
+from wtforms.validators import DataRequired, Optional, URL
 from wtforms.fields import SelectField
 
 class FlashcardSetForm(FlaskForm):
@@ -48,5 +48,8 @@ class CreateStudyPodCommentForm(FlaskForm):
 
 class FlashcardGeneratorForm(FlaskForm):
     topic = StringField('Topic', validators=[DataRequired()])
-    user_prompt = StringField('Prompt', validators=[DataRequired()])
+    num_flashcards = IntegerField('Number of Flashcards', validators=[DataRequired()])
+    question = StringField('Question', validators=[Optional()])
+    article_text = TextAreaField('Article Text', validators=[Optional()])
+    url = StringField('URL', validators=[Optional(), URL(message='Invalid URL')])
     submit = SubmitField('Generate Flashcards')

@@ -1,23 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1>View Searched Set: "{{ flashcard_set.title }}"</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Question</th>
-                    <th scope="col">Answer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for flashcard in flashcards %}
-                <tr>
-                    <td>{{ flashcard.question }}</td>
-                    <td>{{ flashcard.answer }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container">
+    <h1>View Searched Set: "{{ flashcard_set.title }}"</h1>
+    <div class="mt-4">
+        {% for flashcard in flashcards %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ flashcard.question }}</h5>
+                <p class="card-text">{{ flashcard.answer }}</p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
+</div>
 {% endblock %}

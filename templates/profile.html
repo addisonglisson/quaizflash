@@ -1,13 +1,62 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% block meta_description %}
 <meta name="description" content="Your QuaizFlash profile with all of your AI-powered flashcards, flashcard sets, and personalized study plans. Quiz and view your flashcards.">
 {% endblock %}
 {% block content %}
 <div class="container">
+  <!-- Avatar selection section -->
+  {% if not current_user.avatar %}
+    <!-- Avatar selection section -->
+    <form method="POST" action="{{ url_for('profile') }}" class="profile-picture-section">
+      {{ search_form.csrf_token }}
+      <div class="avatar-selection">
+        <label>
+            <input type="radio" name="avatar" value="avatar1.png" required>
+            <img src="{{ url_for('static', filename='avatar1.png') }}" alt="Avatar 1" class="avatar">
+        </label>
+        <label>
+            <input type="radio" name="avatar" value="avatar2.png" required>
+            <img src="{{ url_for('static', filename='avatar2.png') }}" alt="Avatar 2" class="avatar">
+        </label>
+        <label>
+            <input type="radio" name="avatar" value="avatar3.png" required>
+            <img src="{{ url_for('static', filename='avatar3.png') }}" alt="Avatar 3" class="avatar">
+        </label> 
+        <label>
+          <input type="radio" name="avatar" value="avatar4.png" required>
+          <img src="{{ url_for('static', filename='avatar4.png') }}" alt="Avatar 4" class="avatar">
+      </label>
+      <label>
+          <input type="radio" name="avatar" value="avatar5.png" required>
+          <img src="{{ url_for('static', filename='avatar5.png') }}" alt="Avatar 5" class="avatar">
+      </label>
+      <label>
+          <input type="radio" name="avatar" value="avatar6.png" required>
+          <img src="{{ url_for('static', filename='avatar6.png') }}" alt="Avatar 6" class="avatar">
+      </label>  
+      <label>
+          <input type="radio" name="avatar" value="avatar7.png" required>
+          <img src="{{ url_for('static', filename='avatar7.png') }}" alt="Avatar 7" class="avatar">
+      </label>   
+      <label>
+          <input type="radio" name="avatar" value="avatar8.png" required>
+          <img src="{{ url_for('static', filename='avatar8.png') }}" alt="Avatar 8" class="avatar">
+      </label>      
+        <!-- Add more avatars as needed -->
+    </div>
+      <button type="submit" class="btn btn-primary">Save Avatar</button>
+    </form>
+  {% else %}
+    <!-- Display selected avatar -->
+    <div class="profile-picture">
+      <img src="{{ url_for('static', filename=current_user.avatar) }}" alt="Profile Picture">
+    </div>
+  {% endif %}
+
   <div class="profile-header">
     <div class="profile-info">
       <h2>{{ current_user.username }}'s Profile</h2>
-      <p>Email: {{ current_user.email }}</p>
+      <p> {{ current_user.email }}</p>
       <!-- Add more user info here -->
     </div>
     <div class="profile-stats">
@@ -155,4 +204,15 @@
 
     });
   </script>
+  <script>
+    document.querySelectorAll('.avatar').forEach(avatar => {
+        avatar.addEventListener('click', function() {
+            // Remove 'selected' class from all avatars
+            document.querySelectorAll('.avatar').forEach(a => a.classList.remove('selected'));
+            // Add 'selected' class to clicked avatar
+            this.classList.add('selected');
+        });
+    });
+  </script>
+
 {% endblock %}

@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     flashcard_sets = db.relationship('FlashcardSet', backref='author', lazy=True)
     posts = db.relationship('BlogPost', backref='author', lazy=True)  # Relation to BlogPost
     comments = db.relationship('Comment', backref='author', lazy=True)  # Relation to Comment
+    avatar = db.Column(db.String(100))
 
 
 

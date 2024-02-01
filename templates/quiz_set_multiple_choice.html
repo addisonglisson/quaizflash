@@ -72,23 +72,55 @@
       updateCounter();
     });
 
-    submitBtn.addEventListener('click', () => {
+    submitBtn.addEventListener('click', async () => {
       let correctAnswers = 0;
       let totalQuestions = mcFlashcards.length;
 
-      mcFlashcards.forEach((mcFlashcard, i) => {
-        const options = mcFlashcard.querySelectorAll('.option-btn');
-        const correctAnswer = mcFlashcard.dataset.answer;
+      for (let mcFlashcard of mcFlashcards) {
         const selectedAnswer = mcFlashcard.dataset.selected;
+        const correctAnswer = mcFlashcard.dataset.answer;
+        const flashcardId = mcFlashcard.id.split('-')[1];
+    
         if (correctAnswer === selectedAnswer) {
           correctAnswers++;
+          await submitAnswer(flashcardId, true);
+        } else {
+          await submitAnswer(flashcardId, false);
         }
-      });
+      }
 
       alert(`You answered ${correctAnswers} out of ${totalQuestions} questions correctly.`);
+      submitQuizFinish(); // Call this function to mark the quiz as finished
       reviewBtn.style.display = 'block';
       submitBtn.style.display = 'none';
     });
+
+// Function to submit each answer
+    async function submitAnswer(flashcardId, isCorrect) {
+      await fetch('/submit_interaction', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          set_id: {{ flashcard_set.id }},
+          flashcard_id: flashcardId,
+          correct: isCorrect,
+          time_spent: 0 // You can modify this to record the time spent on each question if needed
+      })
+    });
+  }
+
+// Function to submit the end of the quiz
+    async function submitQuizFinish() {
+      await fetch('/submit_interaction', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          set_id: {{ flashcard_set.id }},
+          quiz_finished: true
+        })
+      });
+    }
+
 
     reviewBtn.addEventListener('click', () => {
        mcFlashcards.forEach((mcFlashcard, i) => {
