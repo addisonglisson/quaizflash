@@ -869,7 +869,7 @@ def generate_flashcards():
         elif article_text:
             article = article_text
 
-        prompt = f"Topic: {topic}\n\n{question}\n\n{article}\n\nCreate a list of {num_flashcards} flashcards about {topic}. Start each flashcard with 'Q:' for question and 'A:' for answer. Each flashcard should be concise."
+        prompt = f"Topic: {topic}\n\n{question}\n\n{article}\n\nThe topic of the content is {topic}, Create a list of {num_flashcards} flashcards about the content. Start each flashcard with 'Q:' for question and 'A:' for answer. Each flashcard should be concise."
         print(f"Sending prompt to API: {prompt}")
 
         response = openai.Completion.create(
