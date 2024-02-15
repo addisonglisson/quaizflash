@@ -1,31 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ pod.name }}</h1>
-<div class="pulsating-line"></div>
-<div class="pod-description" style="background-color: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 20px;">
-    <p>{{ pod.description }}</p>
-</div>
-<h2>Posts</h2>
-<div class="pulsating-line"></div>
-{% for post in pod.posts %}
-<div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+<div class="container">
+    <h1 class="pod-title">Welcome to the {{ pod.name }} Study Pod</h1>
+    <div class="pod-description">
+        <p>{{ pod.description }}</p>
+    </div>
     
-    <div style="flex: 1;">
-        <h3><a href="{{ url_for('create_pod_comment', post_id=post.id) }}">{{ post.title }}</a></h3>
-        <p>{{ post.content[:150] }}...</p>
-        <!-- Assuming StudyPodPost has a user_id attribute to determine the author -->
-        <a href="{{ url_for('create_pod_comment', post_id=post.id) }}">Add Comment</a>
+    <section class="pod-posts">
+        <h2>Posts</h2>
+        {% for post in pod.posts %}
+        <article class="post-entry">
+            <header>
+                <h3><a href="{{ url_for('create_pod_comment', post_id=post.id) }}">{{ post.title }}</a></h3>
+            </header>
+            <p>{{ post.content[:150] }}</p>
+            <footer>
+                <a href="{{ url_for('create_pod_comment', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">Add Comment</a>
+            </footer>
+        </article>
+        <section class="post-comments">
+            {% for comment in post.comments %}
+            <div class="comment-entry">
+                <p>{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        </section>
+        {% endfor %}
+    </section>
+    
+    <div class="add-post">
+        <a href="{{ url_for('create_pod_post', pod_id=pod.id) }}" class="btn btn-primary">Add a Post</a>
     </div>
 </div>
-<div class="post-comments">
-    {% for comment in post.comments %}
-    <div class="pod-description" style="background-color: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 20px;">
-        <p>{{ comment.content }}</p>
-    </div>
-    {% endfor %}
-</div>
-{% endfor %}
-<a href="{{ url_for('create_pod_post', pod_id=pod.id) }}" class="btn btn-primary">Add a Post</a>
-
 {% endblock %}

@@ -4,33 +4,41 @@
 {% endblock %}
 {% block content %}
   <h1>{{ title }}</h1>
-  <div class="scrollable-container">
+  <div class="container">
     {% for flashcard_set in flashcard_sets.items %}
-      <div class="flashcard-set">
-        <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
+      <div class="flashcard-set" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; padding: 20px; background-color: #fff; border: 1px solid #ddd; width: 100%; box-sizing: border-box;">
           <!-- User Avatar -->
-          <div style="margin-right: 20px;">
-            <img src="{{ url_for('static', filename=flashcard_set.author.avatar if flashcard_set.author.avatar else 'default_avatar.png') }}" alt="User Avatar" style="width: 100px;">
+          <div style="flex-shrink: 0; margin-right: 0px;">
+            <img src="{{ url_for('static', filename=flashcard_set.author.avatar if flashcard_set.author.avatar else 'default_avatar.png') }}" alt="User Avatar" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
           </div>
           <!-- Flashcard Set Info -->
-          <div style="flex: 1;">
-            <h2><a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}">{{ flashcard_set.title }}</a></h2>
+          <div style="flex-grow: 1; text-align: center; padding-right: 30px;">
+            <h2 style="margin: 0;"><a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}">{{ flashcard_set.title }}</a></h2>
             <p>{{ flashcard_set.description }}</p>
             <p>Created by: {{ flashcard_set.author.username }}</p>
-            <div class="set-actions"></div>
-              <a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">View Set</a>
-              <a href="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">Quiz Me</a>
+            <!-- Set actions here if needed -->
+            <a href="{{ url_for('view_searched_set', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">View Set</a>
+            <a href="{{ url_for('quiz_settings', set_id=flashcard_set.id) }}" class="btn btn-sm btn-outline-primary">Quiz Me</a>
           </div>
         </div>
       </div>
     {% endfor %}
-  </div>
 
   <!-- Add pagination links -->
-  {% if flashcard_sets.has_prev %}
-    <a href="{{ url_for('public_sets', page=flashcard_sets.prev_num) }}">Previous</a>
-  {% endif %}
-  {% if flashcard_sets.has_next %}
-    <a href="{{ url_for('public_sets', page=flashcard_sets.next_num) }}">Next</a>
-  {% endif %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if flashcard_sets.has_prev %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('public_sets', page=flashcard_sets.prev_num) }}">Previous</a>
+        </li>
+      {% endif %}
+      {% if flashcard_sets.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('public_sets', page=flashcard_sets.next_num) }}">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
 {% endblock %}

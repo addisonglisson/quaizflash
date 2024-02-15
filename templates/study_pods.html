@@ -1,23 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1>Study Pods</h1>
-        <div class="pulsating-line"></div>
-        {% for pod in study_pods %}
-            <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff;">
-                <div style="margin-right: 20px;">
-                    <!-- Add an image or logo for each StudyPod if available -->
-                    <img src="{{ url_for('static', filename='qflogo.png') }}" alt="{{ pod.name }}" style="width: 100px;">
-                </div>
-                <div style="flex: 1;">
-                    <h2><a href="{{ url_for('view_pod', pod_id=pod.id) }}">{{ pod.name }}</a></h2>
-                    <p>{{ pod.description|truncate(150, true) }}</p>
-                    <p>Created on {{ pod.created_at.strftime('%Y-%m-%d') }}</p>
-                </div>
+<div class="container">
+    <h1>Study Pods</h1>
+    <div class="pulsating-line"></div>
+    {% for pod in study_pods %}
+        <div class="flashcard-set" style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; background-color: #fff; transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;">
+            <!-- Logo image aligned to the left -->
+            <div style="margin-right: 0px;">
+                <img src="{{ url_for('static', filename='qflogo.png') }}" alt="{{ pod.name }}" style="width: 100px;">
             </div>
-        {% endfor %}
-        <!-- You can add a button to create a new StudyPod if that's a feature of your application -->
-        <!-- <a href="{{ url_for('create_pod') }}" class="btn btn-primary">Create New Study Pod</a> -->
-    </div>
+            <div style="flex: 1;text-align: center; padding-right: 30px;">
+                <h2><a href="{{ url_for('view_pod', pod_id=pod.id) }}">{{ pod.name }}</a></h2>
+                <p>{{ pod.description|truncate(150, true) }}</p>
+                <p>Created on {{ pod.created_at.strftime('%Y-%m-%d') }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if study_pods.has_prev %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('study_pods', page=study_pods.prev_num) }}">Previous</a>
+            </li>
+          {% endif %}
+          {% if study_pods.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('study_pods', page=study_pods.next_num) }}">Next</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    <!-- You can add a button to create a new StudyPod if that's a feature of your application -->
+    <!-- <a href="{{ url_for('create_pod') }}" class="btn btn-primary">Create New Study Pod</a> -->
+</div>
+<script>
+    // Get all elements with the class 'card' and add hover event listeners
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+            card.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.boxShadow = '';
+            card.style.transform = '';
+        });
+    });
+</script>
 {% endblock content %}

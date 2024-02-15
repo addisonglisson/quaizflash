@@ -110,6 +110,7 @@
            <p>Contact us: <a href="mailto:info@quaizflash.com">info@quaizflash.com</a></p>
        </div>
    </footer>
+   {% if session.logged_in %}
    <div class="floating-action-button">
     <a href="#" class="floating-main" id="floating-main">
         <i class="fas fa-bars"></i> <!-- Icon for the main button -->
@@ -123,7 +124,8 @@
         <li><a href="{{ url_for('virtual_tutor') }}"><i class="fas fa-robot"></i> Virtual Tutor</a></li>
         <li><a href="{{ url_for('progress') }}"><i class="fas fa-chart-line"></i> Progress</a></li>
     </ul>
-</div>
+    </div>
+    {% endif %}
 
 
    {% block scripts %}
@@ -144,7 +146,7 @@
         console.log(simplemde);
     });
 
-</script>
+   </script>
    <script>
     
        $(document).ready(function(){

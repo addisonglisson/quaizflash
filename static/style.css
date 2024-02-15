@@ -4,7 +4,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
-  color: #1c62b1;
+  color: #333;
   margin: 0;
   padding: 0;
   background-color: #f5f5f5;
@@ -13,6 +13,7 @@ body {
  
  h1, h2, h3, h4, h5, h6 {
   font-family: 'Raleway', sans-serif;
+  color: #1c62b1;
  }
  
  
@@ -259,8 +260,13 @@ body {
  .flashcard-set {
   text-align: center;
   margin-bottom: 1rem;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
  }
  
+ .flashcard-set:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
  
  .set-title {
   margin-bottom: 0.5rem;
@@ -271,24 +277,31 @@ body {
   margin-bottom: 0.5rem;
  }
  .section-title {
-  text-align: center;
-  margin-bottom: 1rem;
- }
+  background-color: #e8f0fe; /* Light background for the title area */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px; /* Space between title and content */
+}
+
  .card {
   width: 300px;
- 
-  border: 1px solid #ccc;
+  border: 1.5px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
   background-color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px;
- }
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+}
  
- 
+.card:hover {
+  transform: scale(1.03); /* Slightly scale up */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+}
+
  .card .card-title, .card .card-text {
   margin: 0;
   text-align: center;
@@ -434,29 +447,75 @@ body {
  
  /* Add these styles to the existing style.css */
 
-.section {
-  text-align: center;
-  margin-bottom: 50px;
+ .section .faqs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.section h2 {
+.section .faq-item {
+  width: 45%;
+  margin: 10px;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.section .faq-item strong {
+  display: block;
+  margin-bottom: 5px;
+}
+/* Add to style.css */
+
+.hero-section {
+  background-image: url('file:///C:/Users/addisonglisson/Desktop/webappproject/backgroundtest.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
   margin-bottom: 20px;
 }
 
-.section ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.section li {
-  margin-bottom: 10px;
-}
-
-.section p {
-  text-align: justify;
+.hero-section p {
+  font-size: 1.5rem;
   max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: center;
+}
+
+.section {
+  padding: 40px 0;
+}
+
+.section h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.section:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.section .faqs {
+  justify-content: space-around;
+}
+
+.section .faq-item {
+  width: 30%;
+  transition: transform 0.3s;
+}
+
+.section .faq-item:hover {
+  transform: translateY(-10px);
 }
 
 .section .faqs {
@@ -504,18 +563,7 @@ body {
   text-align: center;
 }
 
-.section {
-  padding: 50px 0;
-}
 
-.section h2 {
-  font-size: 2rem;
-  margin-bottom: 30px;
-}
-
-.section:nth-child(even) {
-  background-color: #f5f5f5;
-}
 
 .section .faqs {
   justify-content: space-around;
@@ -762,12 +810,54 @@ table th {
 }
 
 .pod-title {
-  font-size: 1.2em;
-  margin-bottom: 8px;
+  text-align: center;
+  font-size: 2.5rem; /* Larger font size for emphasis */
+  color: #007bff; /* Choose a color that suits your site's theme */
+  margin-bottom: 1rem;
+  font-weight: bold; /* Makes the title bold */
 }
 
 .pod-description {
-  margin-bottom: 10px;
+  background-color: #e9ecef; /* A light grey that stands out */
+  padding: 1rem;
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 1rem;
+  border: 1px solid #0056b3; /* Slightly darker border for definition */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+}
+
+.pod-posts h2 {
+  margin-top: 2em;
+}
+
+.post-entry {
+  background-color: #fff;
+  padding: 1em;
+  border-radius: 10px;
+  margin-bottom: 1em;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.post-entry header h3 {
+  margin-bottom: 0.5em;
+}
+
+.post-comments {
+  margin-top: 1em;
+}
+
+.comment-entry {
+  background-color: #e9ecef; /* A light grey that stands out */
+  padding: 1rem;
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 1rem;
+  border: 1px solid #dee2e6; /* Slightly darker border for definition */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+}
+
+.add-post {
+  margin-top: 2em;
+  text-align: center;
 }
 
 .floating-cta {
@@ -871,19 +961,21 @@ table th {
 }
 
 .stat-box {
-  margin-left: 15px;
+  margin: 0 10px;
+  display: inline-block;
   text-align: center;
 }
 
 .stat-number {
   font-size: 2em;
+  display: block;
   font-weight: bold;
-  color: #007bff;
+  color: #333;
 }
 
 .stat-label {
   font-size: 1em;
-  color: #333;
+  color: #666;
 }
 
 /* Add more styling as needed */
@@ -1035,14 +1127,14 @@ table th {
 
 /* Customizing the search input within the navbar */
 .navbar .form-inline .form-control {
-  border: 1px solid #ccc; /* Optional: Add border to the input */
+  border: 1px solid #1c62b1; /* Optional: Add border to the input */
   background-color: #f8f6f6; /* Make the input background transparent */
   box-shadow: none; /* Remove box shadow from input */
 }
 
 /* Customizing the search button within the navbar */
 .navbar .form-inline .btn {
-  border: 1px solid #f2efef; /* Optional: Add border to the button */
+  border: 1px solid #1c62b1; /* Optional: Add border to the button */
   background-color: transparent; /* Change to your desired button color */
   color: #ffffff; /* Change to your desired button text color */
   font-size: 1.3rem;
@@ -1140,11 +1232,106 @@ table th {
 .update-profile-btn {
   margin-top: 10px;
 }
+
 .profile-picture img {
   border-radius: 50%; /* Makes the image round */
-  float: left; /* Floats the image to the left */
-  margin-right: 20px; /* Adds space to the right of the image */
-  width: 100px; /* Adjust the size as needed */
-  height: 100px; /* Adjust the size as needed */
+  float: left; 
+  width: 70px; /* Adjust the size as needed */
+  height: 70px; /* Adjust the size as needed */
   object-fit: cover; /* Ensures the image covers the area without distortion */
+  border: 2.5px solid #ffffff; /* Optional: adds a white border around the image */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+  margin-right: 20px;
+}
+.profile-info {
+  display: inline-block; /* Allows the text to sit next to the image */
+  vertical-align: middle; /* Aligns the text vertically with the image */
+}
+
+.profile-info h2 {
+  margin: 0; /* Removes default margin */
+  font-size: 2em; /* Adjust the size as needed */
+  font-weight: bold; /* Makes the username bold */
+  color: #333; /* Adjust the color as needed */
+}
+
+.profile-info p {
+  margin: 0; /* Removes default margin */
+  font-size: 1em; /* Adjust the size as needed */
+  color: #666; /* Adjust the color as needed */
+}
+
+.create-pod-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.create-pod-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.create-pod-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.create-pod-form .form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.btn-create-pod {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-create-pod:hover {
+  background-color: #0056b3;
+}
+
+/* Add this to your CSS file */
+.pagination {
+  display: flex;
+  justify-content: center;
+  list-style-type: none; /* Removes default list styling */
+  padding: 0; /* Removes default padding */
+}
+
+.pagination .page-item {
+  margin: 0 5px; /* Adds a little space between the buttons */
+}
+
+.pagination .page-link {
+  text-decoration: none; /* Optional: Removes underline from links */
+  color: #007bff; /* Bootstrap's default blue color for links */
+  /* Add any additional styling you want for the buttons here */
 }

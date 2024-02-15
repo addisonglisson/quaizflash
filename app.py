@@ -788,9 +788,10 @@ def view_pod(pod_id):
 
 @app.route('/study_pods')
 def study_pods():
-    # Fetch all StudyPods from the database
-    all_pods = StudyPod.query.all()
-    return render_template('study_pods.html', study_pods=all_pods, search_form=SearchSetsForm())
+    page = request.args.get('page', 1, type=int)
+    per_page = 15
+    paginated_study_pods = StudyPod.query.paginate(page=page, per_page=per_page)
+    return render_template('study_pods.html', study_pods=paginated_study_pods,search_form=SearchSetsForm())
 
 @app.route('/pod/<int:pod_id>/post', methods=['GET', 'POST'])
 @login_required
