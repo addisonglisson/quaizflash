@@ -825,6 +825,12 @@ table th {
   border: 1px solid #0056b3; /* Slightly darker border for definition */
   box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
 }
+.post-image {
+  max-width: 100%; /* makes sure the image is never wider than its container */
+  height: auto; /* maintains the aspect ratio */
+  display: block; /* prevents inline default spacing */
+  margin: 0 auto; /* centers the image within its container */
+}
 
 .pod-posts h2 {
   margin-top: 2em;

@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Add a Post to {{ pod.name }}</h1>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-
+    
         <div class="form-group">
             {{ form.title.label }}
             {{ form.title(class="form-control") }}
         </div>
-
-        <!-- SimpleMDE Text Area -->
+    
         <div class="form-group">
             {{ form.content.label }}
             <textarea id="content" name="content" class="form-control"></textarea>
         </div>
-
+    
+        <!-- File Upload Field -->
+        <div class="form-group">
+            <label for="image">Upload Image</label>
+            <input type="file" name="image" id="image" class="form-control-file">
+        </div>
+    
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
         </div>

@@ -52,6 +52,7 @@ class StudyPodPost(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     study_pod_id = db.Column(db.Integer, db.ForeignKey('study_pod.id'), nullable=False)
     comments = db.relationship('StudyPodComment', backref='post', lazy=True)
+    image_filename = db.Column(db.String(120), nullable=True)
 
     def __repr__(self):
         return f"<StudyPodPost {self.title}>"

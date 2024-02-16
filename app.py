@@ -4,7 +4,7 @@ import requests
 import xmltodict
 import re
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
@@ -24,6 +24,7 @@ from flask_mail import Mail, Message
 from lxml.etree import Element, SubElement, tostring
 from urllib.parse import urljoin
 from flaskext.markdown import Markdown
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -39,6 +40,9 @@ app.config["MAIL_DEFAULT_SENDER"] = "info@quaizflash.com"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SECURITY_PASSWORD_SALT"] = os.environ.get("SECURITY_PASSWORD_SALT")
 ##app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 mail=Mail(app)
 def generate_token(email):
@@ -124,6 +128,10 @@ def load_user(user_id):
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///your_database_file.db') # Replace with your desired database URI
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','sqlite:///your_database_file.db' ) # Replace with your desired database URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -161,6 +169,7 @@ def fetch_youtube_captions(video_url):
     captions = [entry['text'] for entry in transcript]
     return captions
 
+
 @app.route("/", methods=["GET"])
 @login_required
 def index():
@@ -169,6 +178,19 @@ def index():
     if current_user.is_authenticated:
         return render_template("index.html", search_form=SearchSetsForm())
   
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        return 'File uploaded successfully'
+    return 'Invalid file'
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -799,9 +821,31 @@ def create_pod_post(pod_id):
     form = CreateStudyPodPostForm()
     pod = StudyPod.query.get_or_404(pod_id)
     if form.validate_on_submit():
-        post = StudyPodPost(title=form.title.data, content=form.content.data, study_pod=pod, user_id=current_user.id)
+        # Instantiate a new StudyPodPost
+        post = StudyPodPost(
+            title=form.title.data,
+            content=form.content.data,
+            study_pod=pod,
+            user_id=current_user.id
+        )
+
+        # Check if a file has been uploaded
+        if form.image.data:
+            image_file = form.image.data
+            filename = secure_filename(image_file.filename)
+            # Ensure the UPLOAD_FOLDER exists
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
+            # Save the image
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(filepath)
+            # Update the post object with the image filename
+            post.image_filename = filename
+        
+        # Add and commit the post to the database
         db.session.add(post)
         db.session.commit()
+
         flash('Post added successfully!', 'success')
         return redirect(url_for('view_pod', pod_id=pod_id))
     else:

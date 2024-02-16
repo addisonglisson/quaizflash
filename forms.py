@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, Optional, URL
 from wtforms.fields import SelectField
+from flask_wtf.file import FileField, FileAllowed
 
 class FlashcardSetForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
@@ -40,6 +41,9 @@ class CreateStudyPodForm(FlaskForm):
 class CreateStudyPodPostForm(FlaskForm):
     title = StringField('Post Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])
+    image = FileField('Image', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
+    ])
     submit = SubmitField('Post')
 
 class CreateStudyPodCommentForm(FlaskForm):
