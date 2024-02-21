@@ -1,22 +1,41 @@
 {% extends "base.html" %}
+
 {% block content %}
-    <div class="content-section">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">{{ legend }}</legend>
-                <div class="form-group">
-                    {{ form.question.label(class="form-control-label") }}
-                    {{ form.question(class="form-control form-control-lg") }}
-                </div>
-                <div class="form-group">
-                    {{ form.answer.label(class="form-control-label") }}
-                    {{ form.answer(class="form-control form-control-lg") }}
-                </div>
-            </fieldset>
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group" id="flashcard-fields">
+            <legend class="border-bottom mb-4">{{ legend }}</legend>
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form.question.label(class="form-control-label") }}
+                {{ form.question(class="form-control form-control-lg") }}
             </div>
-        </form>
-    </div>
+            <div class="form-group">
+                {{ form.answer.label(class="form-control-label") }}
+                {{ form.answer(class="form-control form-control-lg") }}
+            </div>
+        </fieldset>
+        <button type="button" id="add-flashcard" style="background-color: #1c62b1; color: white; border-color: #1c62b1; margin-bottom: 10px;" class="btn btn-info">+ Flashcard</button>
+        <div class="form-group mt-2">
+            {{ form.submit(class="btn btn-info") }}
+        </div> 
+    </form>
+</div>
+
+<script>
+    document.getElementById('add-flashcard').addEventListener('click', function() {
+    var container = document.getElementById('flashcard-fields');
+    var index = container.querySelectorAll('.form-group').length / 2; // Calculate the new index based on existing fields
+
+    var newQuestion = document.createElement('div');
+    newQuestion.className = 'form-group';
+    newQuestion.innerHTML = '<label for="question_' + index + '" class="form-control-label">Question</label><input type="text" name="question[]" id="question_' + index + '" class="form-control form-control-lg">';
+    container.appendChild(newQuestion);
+
+    var newAnswer = document.createElement('div');
+    newAnswer.className = 'form-group';
+    newAnswer.innerHTML = '<label for="answer_' + index + '" class="form-control-label">Answer</label><input type="text" name="answer[]" id="answer_' + index + '" class="form-control form-control-lg">';
+    container.appendChild(newAnswer);
+});
+</script>
 {% endblock content %}

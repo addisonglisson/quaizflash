@@ -53,6 +53,7 @@ class StudyPodPost(db.Model):
     study_pod_id = db.Column(db.Integer, db.ForeignKey('study_pod.id'), nullable=False)
     comments = db.relationship('StudyPodComment', backref='post', lazy=True)
     image_filename = db.Column(db.String(120), nullable=True)
+    image_url = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return f"<StudyPodPost {self.title}>"
@@ -75,6 +76,7 @@ class Flashcard(db.Model):
     answer = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     flashcard_set_id = db.Column(db.Integer, db.ForeignKey('flashcard_set.id', name='fk_flashcard_set_id'), nullable=True)  # Added ForeignKey with name
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"Flashcard('{self.question}', '{self.answer}')"

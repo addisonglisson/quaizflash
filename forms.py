@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, IntegerField
+from wtforms import StringField, TextAreaField, SubmitField, IntegerField, FormField, FieldList, Form
 from wtforms.validators import DataRequired, Optional, URL
 from wtforms.fields import SelectField
 from flask_wtf.file import FileField, FileAllowed
@@ -11,7 +11,11 @@ class FlashcardSetForm(FlaskForm):
 class FlashcardForm(FlaskForm):
     question = StringField('Question', validators=[DataRequired()])
     answer = StringField('Answer', validators=[DataRequired()])
-    submit = SubmitField('Add Flashcard')
+    submit = SubmitField('Save Flashcards')
+
+class CreateMultipleFlashcardForm(FlaskForm):
+    flashcards = FieldList(FormField(FlashcardForm), min_entries=1)
+    submit = SubmitField('Submit')
 
 class AddToSetForm(FlaskForm):
     flashcard_id = SelectField('Flashcard', coerce=int)

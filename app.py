@@ -3,13 +3,14 @@ import openai
 import requests
 import xmltodict
 import re
+import boto3
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment, study_pod_members, StudyPodComment, StudyPod, StudyPodPost
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm, FlashcardGeneratorForm
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm, FlashcardGeneratorForm, CreateMultipleFlashcardForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -25,6 +26,7 @@ from lxml.etree import Element, SubElement, tostring
 from urllib.parse import urljoin
 from flaskext.markdown import Markdown
 from werkzeug.utils import secure_filename
+from botocore.exceptions import NoCredentialsError
 
 app = Flask(__name__)
 
@@ -39,10 +41,23 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = "info@quaizflash.com"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SECURITY_PASSWORD_SALT"] = os.environ.get("SECURITY_PASSWORD_SALT")
-##app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
+app.config['AWS_ACCESS_KEY_ID'] = os.environ.get('AWS_ACCESS_KEY_ID')
+app.config['AWS_SECRET_ACCESS_KEY'] = os.environ.get('AWS_SECRET_ACCESS_KEY')
+app.config['S3_BUCKET'] = 'myawsbucketpictures'
+app.config['AWS_REGION']='us-east-2'
+
+#app.config["SERVER_NAME"] = "quaizflash.herokuapp.com"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
+    region_name=app.config['AWS_REGION']
+)
+BUCKET_NAME = 'myawsbucketpictures'
 
 mail=Mail(app)
 def generate_token(email):
@@ -62,6 +77,10 @@ def save_flashcards_to_set(flashcard_data, set_id):
         flashcard = Flashcard(question=flashcard_info['question'], answer=flashcard_info['answer'], user_id=current_user.id, flashcard_set_id=set_id)
         db.session.add(flashcard)
     db.session.commit()
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
@@ -179,18 +198,33 @@ def index():
         return render_template("index.html", search_form=SearchSetsForm())
   
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload_file():
     file = request.files['file']
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-        return 'File uploaded successfully'
-    return 'Invalid file'
+        try:
+            # Upload the file to S3
+            s3.upload_fileobj(
+                file, 
+                app.config['S3_BUCKET'], 
+                filename,
+                ExtraArgs={
+                    "ACL": "public-read"
+                }
+            )
+            # Create the S3 URL
+            file_url = f"https://{app.config['S3_BUCKET']}.s3.amazonaws.com/{filename}"
+            
+            # You can now save this URL to your database or send it back to the frontend
+            # ...
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+            return jsonify({"message": "File uploaded successfully", "file_url": file_url})
+        except NoCredentialsError:
+            return jsonify({"error": "Credentials not available"}), 403
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    return jsonify({"error": "Invalid file"}), 400
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -260,7 +294,7 @@ def profile():
             flash('Avatar updated successfully!', 'success')
         return redirect(url_for('profile'))
 
-    flashcards = Flashcard.query.filter_by(user_id=current_user.id).all()
+    flashcards = Flashcard.query.filter_by(user_id=current_user.id).order_by(Flashcard.created_at.desc()).all()
     flashcard_sets = FlashcardSet.query.filter_by(user_id=current_user.id).all()
     study_pods = current_user.study_pods  
     total_flashcards = len(flashcards)
@@ -356,19 +390,24 @@ def captions():
         return jsonify(captions)
     except Exception as e:
         return jsonify({"error": str(e)})
-@app.route("/create_flashcard", methods=["POST"])
+    
+@app.route("/create_flashcards", methods=["POST"])
 @login_required
-def create_flashcard():
-    question = request.form.get("question")
-    answer = request.form.get("answer")
-    user_id = current_user.id
+def create_flashcards():
+    questions = request.form.getlist('question[]')
+    answers = request.form.getlist('answer[]')
 
-    flashcard = Flashcard(question=question, answer=answer, user_id=current_user.id)
-    db.session.add(flashcard)
+    # Create a new Flashcard object for each question-answer pair and add to the session
+    for question, answer in zip(questions, answers):
+        if question and answer:  # Ensure both question and answer are provided
+            flashcard = Flashcard(question=question, answer=answer, user_id=current_user.id)
+            db.session.add(flashcard)
+    
     db.session.commit()
+    flash('Flashcards created successfully!')
+    return redirect(url_for('profile'))
 
-    flash('Flashcard created successfully!')
-    return redirect(url_for('index'))
+
 
 @app.route('/edit_flashcard/<int:flashcard_id>', methods=['GET', 'POST'])
 @login_required
@@ -821,7 +860,6 @@ def create_pod_post(pod_id):
     form = CreateStudyPodPostForm()
     pod = StudyPod.query.get_or_404(pod_id)
     if form.validate_on_submit():
-        # Instantiate a new StudyPodPost
         post = StudyPodPost(
             title=form.title.data,
             content=form.content.data,
@@ -833,23 +871,21 @@ def create_pod_post(pod_id):
         if form.image.data:
             image_file = form.image.data
             filename = secure_filename(image_file.filename)
-            # Ensure the UPLOAD_FOLDER exists
-            if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                os.makedirs(app.config['UPLOAD_FOLDER'])
-            # Save the image
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image_file.save(filepath)
-            # Update the post object with the image filename
-            post.image_filename = filename
-        
-        # Add and commit the post to the database
+            try:
+                # Upload the file to S3
+                s3.upload_fileobj(image_file, app.config['S3_BUCKET'], filename)
+                # Generate the URL of the uploaded file
+                image_url = f"https://{app.config['S3_BUCKET']}.s3.amazonaws.com/{filename}"
+                # Update the post object with the image URL
+                post.image_url = image_url
+            except Exception as e:
+                flash(f'Error uploading file: {str(e)}', 'danger')
+
         db.session.add(post)
         db.session.commit()
 
         flash('Post added successfully!', 'success')
         return redirect(url_for('view_pod', pod_id=pod_id))
-    else:
-        print(form.errors)  
     return render_template('create_pod_post.html', form=form, pod=pod, search_form=SearchSetsForm())
 
 @app.route('/pod_post/<int:post_id>/comment', methods=['GET', 'POST'])

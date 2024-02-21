@@ -14,9 +14,10 @@
             <header>
                 <h3><a href="{{ url_for('create_pod_comment', post_id=post.id) }}">{{ post.title }}</a></h3>
             </header>
-            {% if post.image_filename %}
-            <img src="{{ url_for('static', filename='uploads/' + post.image_filename) }}" alt="{{ post.title }} Image" class="post-image">
+            {% if post.image_url %}
+                <img src="{{ post.image_url }}" alt="{{ post.title }} Image" class="post-image">
             {% endif %}
+
             <p>{{ post.content[:150] }}</p>
             <footer>
                 <a href="{{ url_for('create_pod_comment', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">Add Comment</a>
