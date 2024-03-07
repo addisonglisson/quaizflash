@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, IntegerField, FormField, FieldList, Form
+from wtforms import StringField, TextAreaField, SubmitField, IntegerField, FormField, FieldList, Form, HiddenField
 from wtforms.validators import DataRequired, Optional, URL
 from wtforms.fields import SelectField
 from flask_wtf.file import FileField, FileAllowed
@@ -61,3 +61,9 @@ class FlashcardGeneratorForm(FlaskForm):
     article_text = TextAreaField('Article Text', validators=[Optional()])
     url = StringField('URL', validators=[Optional(), URL(message='Invalid URL')])
     submit = SubmitField('Generate Flashcards')
+
+class AdvancedTutorForm(FlaskForm):
+    flashcard_set = SelectField('Choose a Flashcard Set', coerce=int)
+    user_input = StringField('Ask a question or say "quiz me" on a chosen set', validators=[DataRequired()])
+    mode = HiddenField(default='learn')
+    submit = SubmitField('Submit')

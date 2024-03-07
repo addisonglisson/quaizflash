@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from models import db, User, Flashcard
 from models import User, Flashcard, FlashcardSet, FlashcardInteraction, StudySession, BlogPost, Comment, study_pod_members, StudyPodComment, StudyPod, StudyPodPost
-from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm, FlashcardGeneratorForm, CreateMultipleFlashcardForm
+from forms import FlashcardSetForm, FlashcardForm, AddToSetForm, VirtualTutorForm, SearchSetsForm, BlogPostForm, CommentForm, CreateStudyPodCommentForm, CreateStudyPodForm, CreateStudyPodPostForm, FlashcardGeneratorForm, CreateMultipleFlashcardForm, AdvancedTutorForm
 from functools import wraps
 from youtube_transcript_api import YouTubeTranscriptApi
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -27,9 +27,10 @@ from urllib.parse import urljoin
 from flaskext.markdown import Markdown
 from werkzeug.utils import secure_filename
 from botocore.exceptions import NoCredentialsError
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-
+load_dotenv()
 Markdown(app)
 
 app.config["MAIL_SERVER"] = "smtp.office365.com"
@@ -1032,3 +1033,65 @@ def edit_generated_flashcards():
         return redirect(url_for('generate_flashcards'))
 
     return render_template('edit_generated_flashcards.html', flashcards=generated_flashcards, search_form=SearchSetsForm())
+
+@app.route('/advanced_tutor', methods=['GET', 'POST'])
+@login_required
+def advanced_tutor():
+    form = AdvancedTutorForm()  # Assuming you have a separate form for the advanced tutor
+    form.flashcard_set.choices = [(set.id, set.title) for set in current_user.flashcard_sets]
+    mode = request.args.get('mode', None)  # Get the selected mode from the query string 
+    print(f"Selected mode: {mode}")
+    advanced_conversation_history = session.get('advanced_conversation_history', [])  
+
+    if form.validate_on_submit():
+        
+        mode = form.mode.data
+        selected_set_id = form.flashcard_set.data
+        selected_flashcard_set = FlashcardSet.query.filter_by(id=selected_set_id).first()
+        user_input = form.user_input.data
+        advanced_conversation_history.append({'role': 'user', 'content': user_input})
+
+        # Get the flashcards for the selected set
+        flashcards = Flashcard.query.filter_by(flashcard_set_id=selected_set_id).all()
+        flashcards_text = "\n".join([f"Q: {card.question} A: {card.answer}" for card in flashcards])
+
+        # Generate the prompt based on the selected mode and flashcards
+        if mode == 'learn':
+            prompt = f"Explain the flashcards:\n{flashcards_text}\n\n{user_input}"
+        elif mode == 'quiz_me':
+            prompt = f"Quiz me on these flashcards:\n{flashcards_text}\n\n{user_input}"
+        else:  # Ask a question mode
+            prompt = f"Answer the question based on these flashcards:\n{flashcards_text}\n\n{user_input}"
+
+        # Prepare the conversation history text
+        history_text = "\n".join([f"{entry['role'].capitalize()}: {entry['content']}" for entry in advanced_conversation_history[-10:]])
+
+        # Combine the prompt with the conversation history
+        full_prompt = f"{prompt}"
+        print(f"Sending prompt to API: {full_prompt}")
+
+        # Call the OpenAI API
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt=full_prompt,
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.6,
+        )
+
+        gpt_response = response.choices[0].text.strip()
+        advanced_conversation_history.append({'role': 'tutor', 'content': gpt_response})
+        session['advanced_conversation_history'] = advanced_conversation_history
+
+    form.mode.data = mode or 'learn'
+    advanced_conversation_history = advanced_conversation_history[::-1]
+    
+    return render_template('advanced_tutor.html', form=form, advanced_conversation_history=advanced_conversation_history, mode=mode, search_form=SearchSetsForm())
+
+@app.route('/clear_conversation', methods=['POST'])
+@login_required
+def clear_conversation():
+    # Ensure you're clearing the right session key used by the advanced tutor.
+    session.pop('advanced_conversation_history', None)  
+    return redirect(url_for('advanced_tutor'))

@@ -12,7 +12,7 @@ QuaizFlash - Home
     <div class="dropdown-divider"></div>
     <img src="{{ url_for('static', filename='quaizflashlogo.png') }}" alt="QuaizFlash Logo" style="max-width: 100%; height: auto;">
     <div class="section">
-        <div class="discover-future-box" style="border: 2px solid #333; border-radius: 5px; padding: 20px; margin: 10px 0;">
+        <div class="discover-future-box slide-in" style="border: 2px solid #333; border-radius: 5px; padding: 20px; margin: 10px 0;background-color: white;">
             <h2 style="font-weight: bold; font-size: 24px;">Discover the Future of Learning with QuAIzFlash</h2>
             <hr>
             <p style="font-size: 18px; line-height: 1.6;">
@@ -215,6 +215,21 @@ QuaizFlash - Home
     
   </div>
 </div>
+<style>
+  @keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
-<!-- ... Rest of your content ... -->
+.slide-in {
+  animation: 1s ease-out 0s 1 slideInFromLeft;
+}
+
+</style>
 {% endblock %}

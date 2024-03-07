@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="chat-interface">
+    <div class="chat-header" style="color: white;">
+        <h1>Your AI Tutor is ready to help.</h1>
+    </div>
+    <div class="chat-body">
+        <div class="chat-container">
+            {% for entry in advanced_conversation_history %}
+            <div class="{{ 'user-message' if entry.role == 'user' else 'tutor-message' }}">
+            {{ entry.content }}
+        </div>
+    {% endfor %}
+            <!-- Chat messages will go here -->
+        </div>
+    </div>
+    <div class="chat-footer">
+        <form method="POST" action="{{ url_for('advanced_tutor') }}" class="chat-form">
+          {{ form.hidden_tag() }}
+          <input type="hidden" name="mode" value="{{ form.mode.data }}" id="mode-input">
+          {{ form.flashcard_set(class="form-control dropdown") }} <!-- Style dropdown -->
+          
+          <div class="input-group">
+            <input type="text" name="user_input" placeholder="Start typing..." class="form-control" required />
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    
+    <div class="chat-sidebar">
+        <button class="sidebar-btn" onclick="changeMode('learn')">Learn</button>
+        <button class="sidebar-btn" onclick="changeMode('quiz_me')">Quiz Me</button>
+        <button class="sidebar-btn" onclick="changeMode('ask_question')">Ask a Question</button>
+        <form method="POST" action="{{ url_for('clear_conversation') }}">
+            {{ form.hidden_tag() }}  <!-- CSRF token -->
+            <button type="submit" class="sidebar-btn" id="clear-conversation">Clear Conversation</button>
+        </form>
+    </div>
+    
+</div>
+<script>
+   function changeMode(newMode) {
+    var form = document.querySelector('.chat-form');
+    var action = form.getAttribute('action');
+    // Remove any existing mode parameter from the action URL
+    action = action.replace(/(\?|&)mode=[^&]*/, '');
+    // Add the new mode to the action URL
+    action += (action.indexOf('?') > -1 ? '&' : '?') + 'mode=' + encodeURIComponent(newMode);
+    form.setAttribute('action', action);
+    // Set the hidden mode field
+    document.getElementById('mode-input').value = newMode;
+    // Submit the form with the new mode
+    form.submit();
+}
+
+</script>
+{% endblock %}
+

@@ -4,6 +4,13 @@
   <div class="container">
     <h1>Virtual Tutor</h1>
     <div class="pulsating-line"></div>
+    <div class="chat-container">
+      {% for message in conversation_history %}
+        <div class="{{ 'user-message' if message.role == 'user' else 'tutor-message' }}">
+          {{ message.content }}
+        </div>
+      {% endfor %}
+    </div>
 
     <form method="POST" action="{{ url_for('virtual_tutor') }}">
       {{ form.csrf_token }}
@@ -27,12 +34,6 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <div class="chat-container">
-      {% for message in conversation_history %}
-        <div class="{{ 'user-message' if message.role == 'user' else 'tutor-message' }}">
-          {{ message.content }}
-        </div>
-      {% endfor %}
-    </div>
+    
   </div>
 {% endblock %}

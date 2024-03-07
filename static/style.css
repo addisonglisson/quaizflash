@@ -306,34 +306,150 @@ body {
   margin: 0;
   text-align: center;
  }
- .chat-container {
+ .chat-interface {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.chat-header {
+  background: #d5d6d8;
+  color: rgb(0, 0, 0);
+  padding: 1rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.chat-body {
+  padding: 1rem;
+  background: #f9f9f9;
+  height: 400px; /* Adjust as needed */
+  overflow-y: auto;
+}
+
+.chat-container {
+  /* Your existing styles */
   max-height: 70vh;
   overflow-y: auto;
   margin-bottom: 2rem;
- }
- 
- 
- .user-message,
- .tutor-message {
+  padding: 1rem;
+  background-color: #f7f7f7; /* Light grey background for the chat container */
+  border: 1px solid #ddd; /* Border for the container */
+  border-radius: 10px; /* Rounded corners for the container */
+}
+
+.chat-footer {
+  padding: 0.5rem;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+.chat-form {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+}
+
+.input-group {
+  display: flex;
+  margin-bottom: 0.5rem; /* Add space between input group and dropdown */
+}
+
+.input-group input,
+.input-group .input-group-append button {
+  flex: 1; /* Input and button take equal space */
+}
+
+.input-group .input-group-append {
+  flex: 0; /* Prevent the append from growing */
+  align-self: center; /* Align button to the center of the input box */
+}
+
+.chat-footer .form-control {
+  margin-bottom: 0.5rem; /* Add some space between the controls */
+}
+
+/* If the form.control is the dropdown, add specific styling */
+.chat-footer .form-control.dropdown {
+  width: 100%; /* Dropdown takes full width */
+}
+
+.chat-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: #e3e3e3; /* Light grey background */
+  padding: 1rem;
+  border-left: 1px solid #ddd;
+}
+
+.user-message,
+.tutor-message {
   margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  max-width: 75%;
- }
- 
- 
- .user-message {
-  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #eaeaea;
+  max-width: 99%;
+  min-width: 20%;
+  width: auto; /* Let it auto adjust the width */
+  display: block; /* Change to block for float to work */
+  word-wrap: break-word;
+  clear: both; /* Prevents floating elements from touching */
+}
+
+.user-message {
+  background-color: #e9ecef;
   color: #212529;
-  align-self: flex-end;
- }
- 
- 
- .tutor-message {
+  align-self: flex-end; /* Aligns the user message to the right */
+  text-align: right;
+  display: block;
+  width: auto;
+
+}
+
+.tutor-message {
   background-color: #1c62b1;
   color: #ffffff;
-  align-self: flex-start;
- }
+  align-self: flex-start; /* Aligns the tutor message to the left */
+  text-align: left;
+}
+
+/* Message text styling */
+.user-message p,
+.tutor-message p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Align the message text to the left */
+.user-message p {
+  text-align: right;
+}
+
+.tutor-message p {
+  text-align: left;
+}
+
+.sidebar-btn {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #5c6bc0;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar-btn:last-child {
+  margin-bottom: 0;
+}
+
+#clear-conversation {
+  background: #f44336; /* Red color for the clear button */
+}
+
  form.inline-form {
   display: inline;
   margin: 0;
@@ -954,20 +1070,26 @@ table th {
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 20px;
+  margin-top: 5px;
+  background-color: #e8f0fe;
+  border: 2px solid #000000;
 }
 
 .profile-info {
   flex-grow: 1;
   text-align: left; /* Aligns text to the left */
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 
 .profile-stats {
   display: flex;
+  margin-top: 3.5px;
 }
 
 .stat-box {
-  margin: 0 10px;
+  margin: 0 5px;
   display: inline-block;
   text-align: center;
 }
@@ -1210,6 +1332,7 @@ table th {
 .profile-picture-section {
   text-align: center;
   margin-bottom: 20px;
+  
 }
 
 .avatar-selection {
@@ -1242,12 +1365,13 @@ table th {
 .profile-picture img {
   border-radius: 50%; /* Makes the image round */
   float: left; 
-  width: 70px; /* Adjust the size as needed */
-  height: 70px; /* Adjust the size as needed */
+  width: 80px; /* Adjust the size as needed */
+  height: 80px; /* Adjust the size as needed */
   object-fit: cover; /* Ensures the image covers the area without distortion */
-  border: 2.5px solid #ffffff; /* Optional: adds a white border around the image */
+  border: 2.5px solid #000000; /* Optional: adds a white border around the image */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
   margin-right: 20px;
+  margin-top: 5px;
 }
 .profile-info {
   display: inline-block; /* Allows the text to sit next to the image */
@@ -1341,3 +1465,4 @@ table th {
   color: #007bff; /* Bootstrap's default blue color for links */
   /* Add any additional styling you want for the buttons here */
 }
+

@@ -48,15 +48,16 @@
     </form>
   {% else %}
     <!-- Display selected avatar -->
-    <div class="profile-picture">
+    <div class="profile-picture fade-in">
       <img src="{{ url_for('static', filename=current_user.avatar) }}" alt="Profile Picture">
     </div>
   {% endif %}
 
   <div class="profile-header">
-    <div class="profile-info">
+    <div class="profile-info slide-up">
       <h2>{{ current_user.username }}'s Profile</h2>
       <p> {{ current_user.email }}</p>
+      <div class="dropdown-divider"></div>
       <!-- Add more user info here -->
     </div>
     <div class="profile-stats">
@@ -77,7 +78,7 @@
       </div>
     </div>
   </div>
-<div class="pulsating-line"></div>
+
 
 
   <h3 class="section-title"><i class="fas fa-th"></i>My Flashcards</h3>
@@ -169,6 +170,37 @@
       {% endif %}
 
 <a href="{{ url_for('create_pod') }}" class="btn btn-primary">Create Study Pod</a>
+<div class="pulsating-line"></div>
+<style>
+  @keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: 1s ease-out 0s 1 fadeIn;
+}
+
+.slide-up {
+  animation: 1s ease-out 0s 1 slideUp;
+}
+
+</style>
 {% endblock %}
 
 {% block scripts %}
